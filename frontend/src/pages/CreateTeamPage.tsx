@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { Plus } from "lucide-react";
 import { createTeam, type TeamVisibility } from "../api/teams";
 
 export default function CreateTeamPage() {
@@ -25,39 +26,44 @@ export default function CreateTeamPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       <h1>Créer une équipe</h1>
-      <label>
-        Nom
-        <input value={name} onChange={(e) => setName(e.target.value)} required maxLength={64} />
-      </label>
-      <label>
-        Description
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={500} />
-      </label>
-      <fieldset>
-        <legend>Visibilité</legend>
-        <label>
-          <input
-            type="radio"
-            name="visibility"
-            checked={visibility === "Public"}
-            onChange={() => setVisibility("Public")}
-          />
-          Publique (visible et consultable par tous les utilisateurs connectés)
+      <form onSubmit={handleSubmit} className="card">
+        <label className="field">
+          Nom
+          <input value={name} onChange={(e) => setName(e.target.value)} required maxLength={64} />
         </label>
-        <label>
-          <input
-            type="radio"
-            name="visibility"
-            checked={visibility === "Prive"}
-            onChange={() => setVisibility("Prive")}
-          />
-          Privée (visible uniquement par ses membres, accessible par lien d'invitation)
+        <label className="field">
+          Description
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={500} />
         </label>
-      </fieldset>
-      {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={submitting}>Créer l'équipe</button>
-    </form>
+        <fieldset>
+          <legend>Visibilité</legend>
+          <label className="field field-inline">
+            <input
+              type="radio"
+              name="visibility"
+              checked={visibility === "Public"}
+              onChange={() => setVisibility("Public")}
+            />
+            Publique (visible et consultable par tous les utilisateurs connectés)
+          </label>
+          <label className="field field-inline">
+            <input
+              type="radio"
+              name="visibility"
+              checked={visibility === "Prive"}
+              onChange={() => setVisibility("Prive")}
+            />
+            Privée (visible uniquement par ses membres, accessible par lien d'invitation)
+          </label>
+        </fieldset>
+        {error && <p className="alert alert-error" role="alert">{error}</p>}
+        <button type="submit" className="btn-primary" disabled={submitting}>
+          <Plus size={16} />
+          Créer l'équipe
+        </button>
+      </form>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
+import { ArrowBigUp, Download, Save, ShieldAlert, Trash2 } from "lucide-react";
 import {
   deleteResource,
   getDownloadUrl,
@@ -35,7 +36,7 @@ export default function ResourcePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  if (notFound) return <p>Ressource introuvable.</p>;
+  if (notFound) return <p className="empty-state">Ressource introuvable.</p>;
   if (!resource) return <p>Chargement...</p>;
 
   const handleDownload = async () => {
@@ -67,36 +68,49 @@ export default function ResourcePage() {
 
   return (
     <div>
-      <h1>{resource.name}</h1>
-      <p>{resource.description}</p>
-      <p>
-        Type : {resource.type} — Équipe : <Link to={`/teams/${resource.teamId}`}>{resource.teamName}</Link> —
-        Publié par {resource.publisherPseudo}
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+        <h1 style={{ margin: 0 }}>{resource.name}</h1>
+        <span className="badge badge-accent">{resource.type}</span>
+      </div>
+      {resource.description && <p className="muted">{resource.description}</p>}
+      <p className="list-item-meta">
+        Équipe : <Link to={`/teams/${resource.teamId}`}>{resource.teamName}</Link> · Publié par {resource.publisherPseudo}
       </p>
-      <button type="button" onClick={handleDownload}>Télécharger</button>
-      <button type="button" onClick={handleUpvote}>
-        {resource.upvotedByMe ? "Retirer mon upvote" : "Upvote"} ({resource.upvoteCount})
-      </button>
+
+      <div style={{ display: "flex", gap: "var(--space-2)" }}>
+        <button type="button" className="btn-primary" onClick={handleDownload}>
+          <Download size={16} />
+          Télécharger
+        </button>
+        <button type="button" className="btn" onClick={handleUpvote}>
+          <ArrowBigUp size={16} />
+          {resource.upvotedByMe ? "Retirer mon upvote" : "Upvote"} ({resource.upvoteCount})
+        </button>
+      </div>
 
       {(resource.canManage || resource.canDelete) && (
-        <section>
+        <section className="card-section">
           <h2>Gestion</h2>
           {resource.canManage && (
-            <form onSubmit={handleUpdate}>
-              <label>
+            <form onSubmit={handleUpdate} className="card">
+              <label className="field">
                 Nom
                 <input value={name} onChange={(e) => setName(e.target.value)} />
               </label>
-              <label>
+              <label className="field">
                 Description
                 <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
               </label>
-              <button type="submit">Enregistrer</button>
+              <button type="submit" className="btn-primary">
+                <Save size={16} />
+                Enregistrer
+              </button>
             </form>
           )}
-          {error && <p role="alert">{error}</p>}
+          {error && <p className="alert alert-error" role="alert">{error}</p>}
           {resource.canDelete && (
-            <button type="button" onClick={handleDelete}>
+            <button type="button" className="btn-danger" onClick={handleDelete} style={{ marginTop: "var(--space-3)" }}>
+              {resource.canManage ? <Trash2 size={16} /> : <ShieldAlert size={16} />}
               {resource.canManage ? "Supprimer" : "Supprimer (modération admin)"}
             </button>
           )}

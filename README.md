@@ -76,6 +76,7 @@ docker-compose.yml
 | 003 | Publication / store de ressources | ✅ Implémentée |
 | 004 | CLI de synchronisation | ✅ Implémentée |
 | 005 | Modération admin | ✅ Implémentée |
+| 006 | Passe de style UI (post-MVP) | ✅ Implémentée |
 
 Voir [.specify/memory/constitution.md](.specify/memory/constitution.md) pour
 les principes directeurs du projet.

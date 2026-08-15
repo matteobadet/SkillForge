@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { LogIn } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../api/client";
 
@@ -30,21 +31,28 @@ export default function LoginPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Connexion</h1>
-      <label>
-        Email
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      </label>
-      <label>
-        Mot de passe
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      </label>
-      {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={submitting}>Se connecter</button>
-      <p>
-        Pas de compte ? <Link to="/signup">Créer un compte</Link>
-      </p>
-    </form>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h1>Connexion</h1>
+        <form onSubmit={handleSubmit}>
+          <label className="field">
+            Email
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </label>
+          <label className="field">
+            Mot de passe
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          </label>
+          {error && <p className="alert alert-error" role="alert">{error}</p>}
+          <button type="submit" className="btn-primary" disabled={submitting}>
+            <LogIn size={16} />
+            Se connecter
+          </button>
+        </form>
+        <p className="auth-card-footer">
+          Pas de compte ? <Link to="/signup">Créer un compte</Link>
+        </p>
+      </div>
+    </div>
   );
 }

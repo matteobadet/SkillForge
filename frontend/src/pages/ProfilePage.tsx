@@ -1,11 +1,10 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Save, Upload } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { apiFetch, ApiError } from "../api/client";
 
 export default function ProfilePage() {
-  const { user, logout, refreshUser } = useAuth();
-  const navigate = useNavigate();
+  const { user, refreshUser } = useAuth();
   const [pseudo, setPseudo] = useState(user?.pseudo ?? "");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -55,38 +54,51 @@ export default function ProfilePage() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
-
   return (
     <div>
-      <nav>
-        <Link to="/store">Store</Link> <Link to="/teams">Équipes</Link>
-      </nav>
       <h1>Mon profil</h1>
-      {user.avatarUrl && <img src={user.avatarUrl} alt="Avatar" width={96} height={96} />}
-      <p>Email : {user.email}</p>
-      <p>Rôle : {user.role}</p>
+      <div className="card" style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
+        {user.avatarUrl ? (
+          <img src={user.avatarUrl} alt="Avatar" width={64} height={64} className="avatar" style={{ width: 64, height: 64 }} />
+        ) : (
+          <div className="avatar" style={{ width: 64, height: 64, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-subtle)" }}>
+            {user.pseudo.slice(0, 1).toUpperCase()}
+          </div>
+        )}
+        <div>
+          <p className="list-item-title" style={{ margin: 0 }}>{user.pseudo}</p>
+          <p className="muted" style={{ margin: 0 }}>{user.email}</p>
+          <span className="badge badge-accent">{user.role}</span>
+        </div>
+      </div>
 
-      <form onSubmit={handlePseudoSubmit}>
-        <label>
-          Pseudo
-          <input value={pseudo} onChange={(e) => setPseudo(e.target.value)} minLength={3} maxLength={32} required />
+      <div className="card-section">
+        <h2>Modifier le pseudo</h2>
+        <form onSubmit={handlePseudoSubmit}>
+          <label className="field">
+            Pseudo
+            <input value={pseudo} onChange={(e) => setPseudo(e.target.value)} minLength={3} maxLength={32} required />
+          </label>
+          <button type="submit" className="btn-primary">
+            <Save size={16} />
+            Enregistrer
+          </button>
+        </form>
+      </div>
+
+      <div className="card-section">
+        <h2>Avatar</h2>
+        <label className="field">
+          <span style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+            <Upload size={16} />
+            Changer d'avatar
+          </span>
+          <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarChange} />
         </label>
-        <button type="submit">Enregistrer</button>
-      </form>
+      </div>
 
-      <label>
-        Changer d'avatar
-        <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarChange} />
-      </label>
-
-      {message && <p role="status">{message}</p>}
-      {error && <p role="alert">{error}</p>}
-
-      <button type="button" onClick={handleLogout}>Se déconnecter</button>
+      {message && <p className="alert alert-success" role="status">{message}</p>}
+      {error && <p className="alert alert-error" role="alert">{error}</p>}
     </div>
   );
 }

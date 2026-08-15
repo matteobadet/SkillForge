@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
+import { Copy, LogOut, Plus, RefreshCw, Save, Trash2, UserMinus, Lock, Globe } from "lucide-react";
 import {
   deleteTeam,
   getInviteLink,
@@ -51,7 +52,7 @@ export default function TeamPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  if (notFound) return <p>Équipe introuvable.</p>;
+  if (notFound) return <p className="empty-state">Équipe introuvable.</p>;
   if (!team) return <p>Chargement...</p>;
 
   const handleUpdate = async (e: FormEvent) => {
@@ -68,6 +69,10 @@ export default function TeamPage() {
   const handleRegenerateLink = async () => {
     const link = await regenerateInviteLink(team.id);
     setInviteUrl(link.inviteUrl);
+  };
+
+  const handleCopyLink = () => {
+    if (inviteUrl) navigator.clipboard.writeText(inviteUrl);
   };
 
   const handleDelete = async () => {
@@ -88,66 +93,123 @@ export default function TeamPage() {
 
   return (
     <div>
-      <h1>{team.name}</h1>
-      <p>{team.description}</p>
-      <p>Visibilité : {team.visibility === "Public" ? "Publique" : "Privée"}</p>
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+        <h1 style={{ margin: 0 }}>{team.name}</h1>
+        <span className="badge">
+          {team.visibility === "Public" ? <Globe size={12} /> : <Lock size={12} />}
+          {team.visibility === "Public" ? "Publique" : "Privée"}
+        </span>
+      </div>
+      {team.description && <p className="muted">{team.description}</p>}
 
       <h2>Membres ({team.members.length})</h2>
-      <ul>
+      <ul className="list">
         {team.members.map((m) => (
-          <li key={m.userId}>
-            {m.avatarUrl && <img src={m.avatarUrl} alt="" width={24} height={24} />} {m.pseudo} ({m.role})
+          <li key={m.userId} className="list-item">
+            <div className="list-item-main" style={{ flexDirection: "row", alignItems: "center", gap: "var(--space-2)" }}>
+              {m.avatarUrl ? (
+                <img src={m.avatarUrl} alt="" className="avatar" />
+              ) : (
+                <span className="avatar" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-subtle)", fontSize: 12 }}>
+                  {m.pseudo.slice(0, 1).toUpperCase()}
+                </span>
+              )}
+              <span className="list-item-title">{m.pseudo}</span>
+              <span className="badge">{m.role}</span>
+            </div>
             {isOwner && m.role !== "Owner" && (
-              <button type="button" onClick={() => handleRemoveMember(m.userId)}>Retirer</button>
+              <button type="button" className="btn-danger" onClick={() => handleRemoveMember(m.userId)}>
+                <UserMinus size={14} />
+                Retirer
+              </button>
             )}
           </li>
         ))}
       </ul>
 
       <h2>Ressources ({resources.length})</h2>
-      {isMember && <Link to={`/teams/${team.id}/resources/new`}>Publier une ressource</Link>}
-      <ul>
-        {resources.map((r) => (
-          <li key={r.id}>
-            <Link to={`/resources/${r.id}`}>{r.name}</Link> ({r.type}, par {r.publisherPseudo}, {r.upvoteCount} upvote{r.upvoteCount > 1 ? "s" : ""})
-          </li>
-        ))}
-      </ul>
+      {isMember && (
+        <Link to={`/teams/${team.id}/resources/new`} className="btn btn-primary" style={{ marginBottom: "var(--space-3)" }}>
+          <Plus size={16} />
+          Publier une ressource
+        </Link>
+      )}
+      {resources.length === 0 ? (
+        <p className="empty-state">Aucune ressource dans cette équipe.</p>
+      ) : (
+        <ul className="list">
+          {resources.map((r) => (
+            <li key={r.id}>
+              <Link to={`/resources/${r.id}`} className="list-item">
+                <div className="list-item-main">
+                  <span className="list-item-title">{r.name}</span>
+                  <span className="list-item-meta">
+                    par {r.publisherPseudo} · {r.upvoteCount} upvote{r.upvoteCount > 1 ? "s" : ""}
+                  </span>
+                </div>
+                <span className="badge badge-accent">{r.type}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {isMember && !isOwner && (
-        <button type="button" onClick={handleLeave}>Quitter l'équipe</button>
+        <button type="button" className="btn-danger" onClick={handleLeave}>
+          <LogOut size={16} />
+          Quitter l'équipe
+        </button>
       )}
 
       {isOwner && (
-        <section>
+        <section className="card-section">
           <h2>Gestion (Owner)</h2>
 
-          <div>
+          <div className="card">
             <h3>Lien d'invitation</h3>
-            {inviteUrl ? <p>{inviteUrl}</p> : <p>Aucun lien actif.</p>}
-            <button type="button" onClick={handleRegenerateLink}>Régénérer le lien</button>
+            {inviteUrl ? (
+              <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center" }}>
+                <code style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{inviteUrl}</code>
+                <button type="button" className="btn" onClick={handleCopyLink}>
+                  <Copy size={14} />
+                  Copier
+                </button>
+              </div>
+            ) : (
+              <p className="muted">Aucun lien actif.</p>
+            )}
+            <button type="button" className="btn" onClick={handleRegenerateLink} style={{ marginTop: "var(--space-2)" }}>
+              <RefreshCw size={14} />
+              Régénérer le lien
+            </button>
           </div>
 
-          <form onSubmit={handleUpdate}>
+          <form onSubmit={handleUpdate} className="card" style={{ marginTop: "var(--space-3)" }}>
             <h3>Modifier l'équipe</h3>
-            <label>
+            <label className="field">
               Nom
               <input value={name} onChange={(e) => setName(e.target.value)} maxLength={64} />
             </label>
-            <label>
+            <label className="field">
               Description
               <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={500} />
             </label>
-            <button type="submit">Enregistrer</button>
+            <button type="submit" className="btn-primary">
+              <Save size={16} />
+              Enregistrer
+            </button>
           </form>
 
-          {error && <p role="alert">{error}</p>}
+          {error && <p className="alert alert-error" role="alert">{error}</p>}
 
-          <button type="button" onClick={handleDelete}>Supprimer l'équipe</button>
+          <button type="button" className="btn-danger" onClick={handleDelete} style={{ marginTop: "var(--space-3)" }}>
+            <Trash2 size={16} />
+            Supprimer l'équipe
+          </button>
         </section>
       )}
 
-      {user && !isMember && <p>Vous n'êtes pas membre de cette équipe.</p>}
+      {user && !isMember && <p className="alert" style={{ marginTop: "var(--space-4)" }}>Vous n'êtes pas membre de cette équipe.</p>}
     </div>
   );
 }

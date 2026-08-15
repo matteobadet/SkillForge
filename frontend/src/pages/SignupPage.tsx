@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { UserPlus } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../api/client";
 
@@ -34,25 +35,32 @@ export default function SignupPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Créer un compte</h1>
-      <label>
-        Email
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      </label>
-      <label>
-        Pseudo
-        <input type="text" minLength={3} maxLength={32} value={pseudo} onChange={(e) => setPseudo(e.target.value)} required />
-      </label>
-      <label>
-        Mot de passe
-        <input type="password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} required />
-      </label>
-      {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={submitting}>Créer mon compte</button>
-      <p>
-        Déjà un compte ? <Link to="/login">Se connecter</Link>
-      </p>
-    </form>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h1>Créer un compte</h1>
+        <form onSubmit={handleSubmit}>
+          <label className="field">
+            Email
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </label>
+          <label className="field">
+            Pseudo
+            <input type="text" minLength={3} maxLength={32} value={pseudo} onChange={(e) => setPseudo(e.target.value)} required />
+          </label>
+          <label className="field">
+            Mot de passe
+            <input type="password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} required />
+          </label>
+          {error && <p className="alert alert-error" role="alert">{error}</p>}
+          <button type="submit" className="btn-primary" disabled={submitting}>
+            <UserPlus size={16} />
+            Créer mon compte
+          </button>
+        </form>
+        <p className="auth-card-footer">
+          Déjà un compte ? <Link to="/login">Se connecter</Link>
+        </p>
+      </div>
+    </div>
   );
 }
