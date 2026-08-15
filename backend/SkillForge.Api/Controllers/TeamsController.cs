@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SkillForge.Api.Extensions;
 using SkillForge.Api.Models;
 using SkillForge.Api.Models.Dtos;
+using SkillForge.Api.Options;
 using SkillForge.Api.Services;
 
 namespace SkillForge.Api.Controllers;
@@ -10,7 +12,7 @@ namespace SkillForge.Api.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/teams")]
-public class TeamsController(TeamService teamService, AvatarStorageService avatarStorage) : ControllerBase
+public class TeamsController(TeamService teamService, ObjectStorageService objectStorage, IOptions<MinioOptions> minioOptions) : ControllerBase
 {
     private bool IsAdmin => User.IsInRole(UserRole.Admin.ToString());
 
@@ -31,7 +33,7 @@ public class TeamsController(TeamService teamService, AvatarStorageService avata
             string? avatarUrl = null;
             if (!string.IsNullOrEmpty(m.User?.AvatarObjectKey))
             {
-                avatarUrl = await avatarStorage.GetAvatarUrlAsync(m.User.AvatarObjectKey);
+                avatarUrl = await objectStorage.GetPresignedUrlAsync(minioOptions.Value.AvatarsBucket, m.User.AvatarObjectKey);
             }
             members.Add(new TeamMemberDto(m.UserId, m.User?.Pseudo ?? "?", avatarUrl, m.Role));
         }

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import {
   deleteTeam,
   getInviteLink,
@@ -10,6 +10,7 @@ import {
   updateTeam,
   type TeamDetail,
 } from "../api/teams";
+import { listTeamResources, type ResourceSummary } from "../api/resources";
 import { useAuth } from "../auth/AuthContext";
 
 export default function TeamPage() {
@@ -17,6 +18,7 @@ export default function TeamPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [team, setTeam] = useState<TeamDetail | null>(null);
+  const [resources, setResources] = useState<ResourceSummary[]>([]);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +39,8 @@ export default function TeamPage() {
         const link = await getInviteLink(id);
         setInviteUrl(link.inviteUrl);
       }
+      const teamResources = await listTeamResources(id);
+      setResources(teamResources);
     } catch {
       setNotFound(true);
     }
@@ -96,6 +100,16 @@ export default function TeamPage() {
             {isOwner && m.role !== "Owner" && (
               <button type="button" onClick={() => handleRemoveMember(m.userId)}>Retirer</button>
             )}
+          </li>
+        ))}
+      </ul>
+
+      <h2>Ressources ({resources.length})</h2>
+      {isMember && <Link to={`/teams/${team.id}/resources/new`}>Publier une ressource</Link>}
+      <ul>
+        {resources.map((r) => (
+          <li key={r.id}>
+            <Link to={`/resources/${r.id}`}>{r.name}</Link> ({r.type}, par {r.publisherPseudo}, {r.upvoteCount} upvote{r.upvoteCount > 1 ? "s" : ""})
           </li>
         ))}
       </ul>

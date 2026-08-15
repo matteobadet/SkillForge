@@ -7,6 +7,9 @@ import TeamsDirectoryPage from "./pages/TeamsDirectoryPage";
 import CreateTeamPage from "./pages/CreateTeamPage";
 import TeamPage from "./pages/TeamPage";
 import JoinTeamPage from "./pages/JoinTeamPage";
+import StorePage from "./pages/StorePage";
+import PublishResourcePage from "./pages/PublishResourcePage";
+import ResourcePage from "./pages/ResourcePage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -18,7 +21,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/profile" replace />} />
+      <Route path="/" element={<Navigate to="/store" replace />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route
@@ -58,6 +61,30 @@ export default function App() {
         element={
           <ProtectedRoute>
             <JoinTeamPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/store"
+        element={
+          <ProtectedRoute>
+            <StorePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams/:teamId/resources/new"
+        element={
+          <ProtectedRoute>
+            <PublishResourcePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/resources/:id"
+        element={
+          <ProtectedRoute>
+            <ResourcePage />
           </ProtectedRoute>
         }
       />

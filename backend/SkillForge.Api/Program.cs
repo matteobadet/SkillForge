@@ -29,6 +29,7 @@ var minioOptions = new MinioOptions
     AccessKey = builder.Configuration["MINIO_ROOT_USER"] ?? throw new InvalidOperationException("MINIO_ROOT_USER is required"),
     SecretKey = builder.Configuration["MINIO_ROOT_PASSWORD"] ?? throw new InvalidOperationException("MINIO_ROOT_PASSWORD is required"),
     AvatarsBucket = builder.Configuration["MINIO_BUCKET_AVATARS"] ?? "avatars",
+    ResourcesBucket = builder.Configuration["MINIO_BUCKET_RESOURCES"] ?? "resources",
     UseSsl = false,
 };
 builder.Services.Configure<MinioOptions>(o =>
@@ -38,6 +39,7 @@ builder.Services.Configure<MinioOptions>(o =>
     o.AccessKey = minioOptions.AccessKey;
     o.SecretKey = minioOptions.SecretKey;
     o.AvatarsBucket = minioOptions.AvatarsBucket;
+    o.ResourcesBucket = minioOptions.ResourcesBucket;
     o.UseSsl = minioOptions.UseSsl;
 });
 
@@ -65,8 +67,9 @@ builder.Services.AddKeyedSingleton<IMinioClient>("public", (_, _) => new MinioCl
     .Build());
 
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<AvatarStorageService>();
+builder.Services.AddScoped<ObjectStorageService>();
 builder.Services.AddScoped<TeamService>();
+builder.Services.AddScoped<ResourceService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -108,8 +111,9 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
 
-    var avatarStorage = scope.ServiceProvider.GetRequiredService<AvatarStorageService>();
-    await avatarStorage.EnsureBucketExistsAsync();
+    var objectStorage = scope.ServiceProvider.GetRequiredService<ObjectStorageService>();
+    await objectStorage.EnsureBucketExistsAsync(minioOptions.AvatarsBucket);
+    await objectStorage.EnsureBucketExistsAsync(minioOptions.ResourcesBucket);
 }
 
 // ---- Pipeline ----

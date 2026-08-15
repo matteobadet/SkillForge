@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SkillForge.Api.Data;
 using SkillForge.Api.Extensions;
 using SkillForge.Api.Models;
 using SkillForge.Api.Models.Dtos;
+using SkillForge.Api.Options;
 using SkillForge.Api.Services;
 
 namespace SkillForge.Api.Controllers;
@@ -12,17 +14,18 @@ namespace SkillForge.Api.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/users")]
-public class UsersController(AppDbContext db, AvatarStorageService avatarStorage) : ControllerBase
+public class UsersController(AppDbContext db, ObjectStorageService objectStorage, IOptions<MinioOptions> minioOptions) : ControllerBase
 {
     private static readonly HashSet<string> AllowedContentTypes = new() { "image/jpeg", "image/png", "image/webp" };
     private const long MaxAvatarSizeBytes = 5 * 1024 * 1024;
+    private string AvatarsBucket => minioOptions.Value.AvatarsBucket;
 
     private async Task<UserDto> ToDtoAsync(User user)
     {
         string? avatarUrl = null;
         if (!string.IsNullOrEmpty(user.AvatarObjectKey))
         {
-            avatarUrl = await avatarStorage.GetAvatarUrlAsync(user.AvatarObjectKey);
+            avatarUrl = await objectStorage.GetPresignedUrlAsync(AvatarsBucket, user.AvatarObjectKey);
         }
 
         return new UserDto(user.Id, user.Email, user.Pseudo, avatarUrl, user.Role.ToString(), user.CreatedAt);
@@ -74,7 +77,8 @@ public class UsersController(AppDbContext db, AvatarStorageService avatarStorage
         try
         {
             await using var stream = file.OpenReadStream();
-            newObjectKey = await avatarStorage.UploadAvatarAsync(user.Id, stream, file.Length, file.ContentType);
+            var objectKey = $"{user.Id}/{Guid.NewGuid()}";
+            newObjectKey = await objectStorage.UploadAsync(AvatarsBucket, objectKey, stream, file.Length, file.ContentType);
         }
         catch (Exception)
         {
@@ -88,7 +92,7 @@ public class UsersController(AppDbContext db, AvatarStorageService avatarStorage
 
         if (!string.IsNullOrEmpty(previousObjectKey))
         {
-            await avatarStorage.DeleteAvatarAsync(previousObjectKey);
+            await objectStorage.DeleteAsync(AvatarsBucket, previousObjectKey);
         }
 
         return Ok(await ToDtoAsync(user));

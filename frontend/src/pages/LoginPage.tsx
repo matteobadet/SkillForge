@@ -17,7 +17,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login(email, password);
-      navigate("/profile");
+      navigate("/store");
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         setError("Email ou mot de passe incorrect.");

@@ -18,7 +18,7 @@ export default function SignupPage() {
     setSubmitting(true);
     try {
       await register(email, password, pseudo);
-      navigate("/profile");
+      navigate("/store");
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         const code = (err.body as { error?: string })?.error;

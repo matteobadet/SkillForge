@@ -68,7 +68,7 @@ docker-compose.yml
 |---|---|---|
 | 001 | Socle auth / BDD / Docker | ✅ Implémentée |
 | 002 | Gestion des équipes | ✅ Implémentée |
-| 003 | Publication / store de ressources | À venir |
+| 003 | Publication / store de ressources | ✅ Implémentée |
 | 004 | CLI de synchronisation | À venir |
 | 005 | Modération admin | À venir |
 

@@ -63,7 +63,7 @@ export default function ProfilePage() {
   return (
     <div>
       <nav>
-        <Link to="/teams">Équipes</Link>
+        <Link to="/store">Store</Link> <Link to="/teams">Équipes</Link>
       </nav>
       <h1>Mon profil</h1>
       {user.avatarUrl && <img src={user.avatarUrl} alt="Avatar" width={96} height={96} />}

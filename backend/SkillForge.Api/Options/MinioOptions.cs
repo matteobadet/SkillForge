@@ -10,5 +10,6 @@ public class MinioOptions
     public required string AccessKey { get; set; }
     public required string SecretKey { get; set; }
     public required string AvatarsBucket { get; set; }
+    public required string ResourcesBucket { get; set; }
     public bool UseSsl { get; set; } = false;
 }

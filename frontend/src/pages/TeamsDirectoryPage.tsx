@@ -34,6 +34,9 @@ export default function TeamsDirectoryPage() {
 
   return (
     <div>
+      <nav>
+        <Link to="/store">Store</Link> <Link to="/profile">Mon profil</Link>
+      </nav>
       <h1>Équipes</h1>
       <Link to="/teams/new">Créer une équipe</Link>
 

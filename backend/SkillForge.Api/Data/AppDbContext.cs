@@ -10,6 +10,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
     public DbSet<TeamInviteLink> TeamInviteLinks => Set<TeamInviteLink>();
+    public DbSet<Resource> Resources => Set<Resource>();
+    public DbSet<ResourceUpvote> ResourceUpvotes => Set<ResourceUpvote>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,6 +61,35 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasOne(l => l.Team)
                 .WithMany(t => t.InviteLinks)
                 .HasForeignKey(l => l.TeamId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Resource>(entity =>
+        {
+            entity.ToTable("resources");
+            entity.Property(r => r.Type).HasConversion<string>();
+            entity.HasIndex(r => new { r.TeamId, r.Name }).IsUnique();
+            entity.HasOne(r => r.Team)
+                .WithMany()
+                .HasForeignKey(r => r.TeamId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(r => r.PublisherUser)
+                .WithMany()
+                .HasForeignKey(r => r.PublisherUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ResourceUpvote>(entity =>
+        {
+            entity.ToTable("resource_upvotes");
+            entity.HasIndex(u => new { u.ResourceId, u.UserId }).IsUnique();
+            entity.HasOne(u => u.Resource)
+                .WithMany(r => r.Upvotes)
+                .HasForeignKey(u => u.ResourceId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>()
+                .WithMany()
+                .HasForeignKey(u => u.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }
