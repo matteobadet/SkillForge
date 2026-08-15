@@ -256,9 +256,7 @@ form {
   font-weight: 400;
 }
 
-input[type='text'],
-input[type='email'],
-input[type='password'],
+input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']),
 textarea,
 select {
   font: inherit;

@@ -217,7 +217,7 @@ export default function TeamPage() {
             <h3>Modifier l'équipe</h3>
             <label className="field">
               Nom
-              <input value={name} onChange={(e) => setName(e.target.value)} maxLength={64} />
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} maxLength={64} />
             </label>
             <label className="field">
               Description

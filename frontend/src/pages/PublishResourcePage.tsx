@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { UploadCloud } from "lucide-react";
 import { publishResource, uploadResourceIcon, type ResourceType } from "../api/resources";
 import IconPicker, { type IconPickerValue } from "../components/IconPicker";
+import FileInput from "../components/FileInput";
 
 export default function PublishResourcePage() {
   const { teamId } = useParams<{ teamId: string }>();
@@ -39,7 +40,7 @@ export default function PublishResourcePage() {
       <form onSubmit={handleSubmit} className="card">
         <label className="field">
           Nom
-          <input value={name} onChange={(e) => setName(e.target.value)} required />
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
         </label>
         <label className="field">
           Description
@@ -54,10 +55,10 @@ export default function PublishResourcePage() {
           </select>
         </label>
         <IconPicker value={icon} onChange={setIcon} />
-        <label className="field">
-          Archive (.zip, 50 Mo max)
-          <input type="file" accept=".zip" onChange={(e) => setFile(e.target.files?.[0] ?? null)} required />
-        </label>
+        <div className="field">
+          <span>Archive</span>
+          <FileInput accept=".zip" placeholder="Choisir une archive .zip (50 Mo max)" file={file} onChange={setFile} />
+        </div>
         {error && <p className="alert alert-error" role="alert">{error}</p>}
         <button type="submit" className="btn-primary" disabled={submitting || !file}>
           <UploadCloud size={16} />

@@ -117,7 +117,7 @@ export default function ResourcePage() {
               <form onSubmit={handleUpdate} className="card" style={{ marginTop: "var(--space-3)" }}>
                 <label className="field">
                   Nom
-                  <input value={name} onChange={(e) => setName(e.target.value)} />
+                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
                 </label>
                 <label className="field">
                   Description

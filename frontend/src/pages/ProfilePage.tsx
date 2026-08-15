@@ -1,7 +1,8 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
-import { Save, Upload } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { Save } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { apiFetch, ApiError } from "../api/client";
+import FileInput from "../components/FileInput";
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
@@ -9,6 +10,7 @@ export default function ProfilePage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const [avatarUploadKey, setAvatarUploadKey] = useState(0);
 
   if (!user) return null;
 
@@ -36,8 +38,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handleAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleAvatarChange = async (file: File | null) => {
     if (!file) return;
     setError(null);
     setMessage(null);
@@ -53,6 +54,8 @@ export default function ProfilePage() {
       setMessage("Avatar mis à jour.");
     } catch {
       setError("Échec de l'upload de l'avatar.");
+    } finally {
+      setAvatarUploadKey((k) => k + 1);
     }
   };
 
@@ -87,7 +90,7 @@ export default function ProfilePage() {
         <form onSubmit={handlePseudoSubmit}>
           <label className="field">
             Pseudo
-            <input value={pseudo} onChange={(e) => setPseudo(e.target.value)} minLength={3} maxLength={32} required />
+            <input type="text" value={pseudo} onChange={(e) => setPseudo(e.target.value)} minLength={3} maxLength={32} required />
           </label>
           <button type="submit" className="btn-primary">
             <Save size={16} />
@@ -98,13 +101,13 @@ export default function ProfilePage() {
 
       <div className="card-section">
         <h2>Avatar</h2>
-        <label className="field">
-          <span style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
-            <Upload size={16} />
-            Changer d'avatar
-          </span>
-          <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarChange} />
-        </label>
+        <FileInput
+          key={avatarUploadKey}
+          accept="image/jpeg,image/png,image/webp"
+          placeholder="Changer d'avatar (jpeg/png/webp, 5 Mo max)"
+          file={null}
+          onChange={handleAvatarChange}
+        />
       </div>
 
       {message && <p className="alert alert-success" role="status">{message}</p>}

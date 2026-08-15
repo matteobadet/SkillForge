@@ -1,6 +1,5 @@
-import { useRef } from "react";
-import { Upload } from "lucide-react";
 import { ICON_PRESET_KEYS, ICON_PRESETS } from "../icons/presets";
+import FileInput from "./FileInput";
 
 export interface IconPickerValue {
   preset: string | null;
@@ -13,11 +12,9 @@ interface IconPickerProps {
 }
 
 export default function IconPicker({ value, onChange }: IconPickerProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const previewUrl = value.file ? URL.createObjectURL(value.file) : null;
 
   const selectPreset = (key: string) => {
-    if (fileInputRef.current) fileInputRef.current.value = "";
     onChange({ preset: key, file: null });
   };
 
@@ -46,17 +43,13 @@ export default function IconPicker({ value, onChange }: IconPickerProps) {
           );
         })}
       </div>
-      <label className="icon-picker-upload">
-        <Upload size={14} />
-        {value.file ? value.file.name : "Ou uploader une image (jpeg/png/webp, 2 Mo max)"}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => selectFile(e.target.files?.[0] ?? null)}
-          style={{ display: "none" }}
-        />
-      </label>
+      <FileInput
+        key={value.file ? "has-file" : "no-file"}
+        accept="image/jpeg,image/png,image/webp"
+        placeholder="Ou uploader une image (jpeg/png/webp, 2 Mo max)"
+        file={value.file}
+        onChange={selectFile}
+      />
       {previewUrl && <img src={previewUrl} alt="Aperçu" className="icon-circle" style={{ width: 48, height: 48 }} />}
     </div>
   );

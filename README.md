@@ -78,6 +78,7 @@ docker-compose.yml
 | 005 | Modération admin | ✅ Implémentée |
 | 006 | Passe de style UI (post-MVP) | ✅ Implémentée |
 | 007 | Icônes équipes/ressources + cards (post-MVP) | ✅ Implémentée |
+| 008 | Recherche/filtres + corrections de champs (post-MVP) | ✅ Implémentée |
 
 Voir [.specify/memory/constitution.md](.specify/memory/constitution.md) pour
 les principes directeurs du projet.
