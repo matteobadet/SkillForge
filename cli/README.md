@@ -24,10 +24,12 @@ Invite email + mot de passe, stocke la session dans
 
 Supprime la session locale.
 
-### `skillforge teams`
+### `skillforge teams [--json]`
 
 Liste les équipes dont vous êtes membre (nom + identifiant, nécessaire pour
-`pull`/`push`).
+`pull`/`push`). `--json` sort un tableau JSON brut, pratique pour scripter
+une synchronisation multi-équipes (voir
+[examples/hooks/session-start-sync](../examples/hooks/session-start-sync)).
 
 ### `skillforge pull <teamId> [--dir <chemin>]`
 

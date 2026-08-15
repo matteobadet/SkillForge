@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"C:\\Users\\VOTRE_NOM\\CLAUDE\\sync-teams.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -33,9 +33,10 @@ program
 program
   .command("teams")
   .description("Lister mes équipes")
-  .action(async () => {
+  .option("--json", "Sortie JSON (pour scripts)")
+  .action(async (opts: { json?: boolean }) => {
     const apiUrl = resolveApiUrl(program.opts().apiUrl);
-    await teamsCommand(new ApiClient(apiUrl));
+    await teamsCommand(new ApiClient(apiUrl), { json: opts.json });
   });
 
 program
