@@ -23,15 +23,15 @@ Web app monorepo (cf. plan.md) : `backend/SkillForge.Api/`, `frontend/src/`.
 
 **Purpose**: Structure de dépôt et scaffolding des projets.
 
-- [ ] T001 Créer l'arborescence `backend/`, `frontend/` à la racine du dépôt
-- [ ] T002 Scaffolder le projet ASP.NET Core Web API dans `backend/SkillForge.Api/` (`dotnet new webapi`, cible .NET 9) et le projet de test `backend/SkillForge.Api.Tests/` (`dotnet new xunit`)
-- [ ] T003 Ajouter les packages NuGet à `backend/SkillForge.Api/SkillForge.Api.csproj` : `Microsoft.EntityFrameworkCore.Design`, `Npgsql.EntityFrameworkCore.PostgreSQL`, `Microsoft.AspNetCore.Authentication.JwtBearer`, `System.IdentityModel.Tokens.Jwt`, `Microsoft.AspNetCore.Identity`, `Minio`
-- [ ] T004 Scaffolder le projet frontend dans `frontend/` (`npm create vite@latest . -- --template react-ts`)
-- [ ] T005 [P] Ajouter `frontend/package.json` : dépendance `react-router-dom`
-- [ ] T006 [P] Créer `.env.example` à la racine (variables : `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`, `MINIO_BUCKET_AVATARS`, `JWT_SIGNING_KEY`, `JWT_ISSUER`, `API_PORT`, `FRONTEND_PORT`)
-- [ ] T007 Créer `docker-compose.yml` à la racine avec les services `db` (postgres:16), `storage` (minio/minio), `api` (build `backend/SkillForge.Api/Dockerfile`), `frontend` (build `frontend/Dockerfile`) et un réseau partagé, en consommant les variables de `.env`
-- [ ] T008 [P] Créer `backend/SkillForge.Api/Dockerfile` (build + run .NET 9)
-- [ ] T009 [P] Créer `frontend/Dockerfile` (dev server Vite exposé sur `FRONTEND_PORT`)
+- [x] T001 Créer l'arborescence `backend/`, `frontend/` à la racine du dépôt
+- [x] T002 Scaffolder le projet ASP.NET Core Web API dans `backend/SkillForge.Api/` (`dotnet new webapi`, cible .NET 9) et le projet de test `backend/SkillForge.Api.Tests/` (`dotnet new xunit`)
+- [x] T003 Ajouter les packages NuGet à `backend/SkillForge.Api/SkillForge.Api.csproj` : `Microsoft.EntityFrameworkCore.Design`, `Npgsql.EntityFrameworkCore.PostgreSQL`, `Microsoft.AspNetCore.Authentication.JwtBearer`, `System.IdentityModel.Tokens.Jwt`, `Microsoft.AspNetCore.Identity`, `Minio`
+- [x] T004 Scaffolder le projet frontend dans `frontend/` (`npm create vite@latest . -- --template react-ts`)
+- [x] T005 [P] Ajouter `frontend/package.json` : dépendance `react-router-dom`
+- [x] T006 [P] Créer `.env.example` à la racine (variables : `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`, `MINIO_BUCKET_AVATARS`, `JWT_SIGNING_KEY`, `JWT_ISSUER`, `API_PORT`, `FRONTEND_PORT`)
+- [x] T007 Créer `docker-compose.yml` à la racine avec les services `db` (postgres:16), `storage` (minio/minio), `api` (build `backend/SkillForge.Api/Dockerfile`), `frontend` (build `frontend/Dockerfile`) et un réseau partagé, en consommant les variables de `.env`
+- [x] T008 [P] Créer `backend/SkillForge.Api/Dockerfile` (build + run .NET 9)
+- [x] T009 [P] Créer `frontend/Dockerfile` (dev server Vite exposé sur `FRONTEND_PORT`)
 
 ---
 
@@ -41,17 +41,17 @@ Web app monorepo (cf. plan.md) : `backend/SkillForge.Api/`, `frontend/src/`.
 
 **⚠️ CRITICAL**: Aucune user story ne peut être implémentée avant la fin de cette phase.
 
-- [ ] T010 Créer le modèle `User` dans `backend/SkillForge.Api/Models/User.cs` (champs selon data-model.md)
-- [ ] T011 Créer le modèle `RefreshToken` dans `backend/SkillForge.Api/Models/RefreshToken.cs` (champs selon data-model.md)
-- [ ] T012 Créer `backend/SkillForge.Api/Data/AppDbContext.cs` (DbSets `Users`, `RefreshTokens`, contraintes unique sur `Email`, `Pseudo`, `TokenHash`)
-- [ ] T013 Générer la migration initiale `dotnet ef migrations add InitialCreate` dans `backend/SkillForge.Api/Data/Migrations/`
-- [ ] T014 Configurer `backend/SkillForge.Api/Program.cs` : lecture config depuis variables d'environnement, enregistrement `AppDbContext` (Npgsql), appel `dbContext.Database.Migrate()` au démarrage
-- [ ] T015 Configurer l'authentification JWT Bearer dans `backend/SkillForge.Api/Program.cs` (validation issuer/signature, mapping du rôle dans les claims)
-- [ ] T016 [P] Créer `backend/SkillForge.Api/Services/AuthService.cs` : hachage/vérification mot de passe (`PasswordHasher<User>`), émission JWT, génération + hachage SHA-256 des refresh tokens, logique de rotation/révocation (cf. data-model.md)
-- [ ] T017 [P] Créer `backend/SkillForge.Api/Services/AvatarStorageService.cs` : client `Minio`, création du bucket `avatars` si absent, upload/suppression d'objet, génération d'URL de lecture
-- [ ] T018 Ajouter un endpoint `GET /health` dans `backend/SkillForge.Api/Program.cs` (vérifie la connexion DB) pour la validation de l'environnement (cf. quickstart.md)
-- [ ] T019 [P] Créer `frontend/src/api/client.ts` : wrapper fetch, stockage des tokens, rafraîchissement transparent sur réponse 401 via `/api/auth/refresh`
-- [ ] T020 [P] Créer `frontend/src/auth/AuthContext.tsx` : état d'authentification global (user courant, login/logout/register)
+- [x] T010 Créer le modèle `User` dans `backend/SkillForge.Api/Models/User.cs` (champs selon data-model.md)
+- [x] T011 Créer le modèle `RefreshToken` dans `backend/SkillForge.Api/Models/RefreshToken.cs` (champs selon data-model.md)
+- [x] T012 Créer `backend/SkillForge.Api/Data/AppDbContext.cs` (DbSets `Users`, `RefreshTokens`, contraintes unique sur `Email`, `Pseudo`, `TokenHash`)
+- [x] T013 Générer la migration initiale `dotnet ef migrations add InitialCreate` dans `backend/SkillForge.Api/Data/Migrations/`
+- [x] T014 Configurer `backend/SkillForge.Api/Program.cs` : lecture config depuis variables d'environnement, enregistrement `AppDbContext` (Npgsql), appel `dbContext.Database.Migrate()` au démarrage
+- [x] T015 Configurer l'authentification JWT Bearer dans `backend/SkillForge.Api/Program.cs` (validation issuer/signature, mapping du rôle dans les claims)
+- [x] T016 [P] Créer `backend/SkillForge.Api/Services/AuthService.cs` : hachage/vérification mot de passe (`PasswordHasher<User>`), émission JWT, génération + hachage SHA-256 des refresh tokens, logique de rotation/révocation (cf. data-model.md)
+- [x] T017 [P] Créer `backend/SkillForge.Api/Services/AvatarStorageService.cs` : client `Minio`, création du bucket `avatars` si absent, upload/suppression d'objet, génération d'URL de lecture
+- [x] T018 Ajouter un endpoint `GET /health` dans `backend/SkillForge.Api/Program.cs` (vérifie la connexion DB) pour la validation de l'environnement (cf. quickstart.md)
+- [x] T019 [P] Créer `frontend/src/api/client.ts` : wrapper fetch, stockage des tokens, rafraîchissement transparent sur réponse 401 via `/api/auth/refresh`
+- [x] T020 [P] Créer `frontend/src/auth/AuthContext.tsx` : état d'authentification global (user courant, login/logout/register)
 
 ---
 
@@ -61,12 +61,12 @@ Web app monorepo (cf. plan.md) : `backend/SkillForge.Api/`, `frontend/src/`.
 
 **Independent Test**: `POST /api/auth/register` puis `POST /api/auth/login` avec les mêmes identifiants (cf. quickstart.md, scénario User Story 1).
 
-- [ ] T021 [US1] Créer les DTOs `RegisterRequest`, `LoginRequest`, `AuthResponse`, `UserDto` dans `backend/SkillForge.Api/Models/Dtos/AuthDtos.cs`
-- [ ] T022 [US1] Créer `backend/SkillForge.Api/Controllers/AuthController.cs` avec `POST /api/auth/register` (validation email/pseudo/mot de passe ≥ 8 caractères, 409 si email/pseudo pris, 201 + tokens sinon)
-- [ ] T023 [US1] Ajouter `POST /api/auth/login` dans `AuthController.cs` (401 générique si échec, 200 + tokens sinon)
-- [ ] T024 [US1] Créer `frontend/src/pages/SignupPage.tsx` (formulaire email/mot de passe/pseudo, appel register, redirection après succès)
-- [ ] T025 [US1] Créer `frontend/src/pages/LoginPage.tsx` (formulaire email/mot de passe, appel login, redirection après succès)
-- [ ] T026 [US1] Câbler les routes `/signup` et `/login` dans `frontend/src/main.tsx` (react-router)
+- [x] T021 [US1] Créer les DTOs `RegisterRequest`, `LoginRequest`, `AuthResponse`, `UserDto` dans `backend/SkillForge.Api/Models/Dtos/AuthDtos.cs`
+- [x] T022 [US1] Créer `backend/SkillForge.Api/Controllers/AuthController.cs` avec `POST /api/auth/register` (validation email/pseudo/mot de passe ≥ 8 caractères, 409 si email/pseudo pris, 201 + tokens sinon)
+- [x] T023 [US1] Ajouter `POST /api/auth/login` dans `AuthController.cs` (401 générique si échec, 200 + tokens sinon)
+- [x] T024 [US1] Créer `frontend/src/pages/SignupPage.tsx` (formulaire email/mot de passe/pseudo, appel register, redirection après succès)
+- [x] T025 [US1] Créer `frontend/src/pages/LoginPage.tsx` (formulaire email/mot de passe, appel login, redirection après succès)
+- [x] T026 [US1] Câbler les routes `/signup` et `/login` dans `frontend/src/main.tsx` (react-router)
 
 **Checkpoint**: US1 testable de bout en bout indépendamment.
 
@@ -78,9 +78,9 @@ Web app monorepo (cf. plan.md) : `backend/SkillForge.Api/`, `frontend/src/`.
 
 **Independent Test**: Sur un checkout propre, `cp .env.example .env && docker compose up --build` puis `GET /health` répond 200 (cf. quickstart.md, scénario User Story 4).
 
-- [ ] T027 [US4] Vérifier/ajuster `docker-compose.yml` : healthchecks sur `db` et `storage`, `depends_on` avec `condition: service_healthy` pour `api`
-- [ ] T028 [US4] Documenter dans `README.md` (racine) la procédure de démarrage en 3 commandes (clone, `cp .env.example .env`, `docker compose up --build`)
-- [ ] T029 [US4] Valider manuellement le scénario "machine propre" du quickstart.md (down -v puis up) et corriger tout écart
+- [x] T027 [US4] Vérifier/ajuster `docker-compose.yml` : healthchecks sur `db` et `storage`, `depends_on` avec `condition: service_healthy` pour `api`
+- [x] T028 [US4] Documenter dans `README.md` (racine) la procédure de démarrage en 3 commandes (clone, `cp .env.example .env`, `docker compose up --build`)
+- [x] T029 [US4] Valider manuellement le scénario "machine propre" du quickstart.md (down -v puis up) et corriger tout écart
 
 **Checkpoint**: Stack complète démarrable en une commande documentée.
 
@@ -92,10 +92,10 @@ Web app monorepo (cf. plan.md) : `backend/SkillForge.Api/`, `frontend/src/`.
 
 **Independent Test**: `POST /api/auth/refresh` avec un refresh token valide renvoie de nouveaux tokens ; `POST /api/auth/logout` puis un nouveau `/refresh` avec le même token renvoie 401 (cf. quickstart.md, scénario User Story 2).
 
-- [ ] T030 [US2] Ajouter `POST /api/auth/refresh` dans `AuthController.cs` (rotation via `AuthService`, 401 si invalide/expiré/révoqué, révocation en cascade si réutilisation d'un token révoqué détectée)
-- [ ] T031 [US2] Ajouter `POST /api/auth/logout` (🔒) dans `AuthController.cs` (révoque le refresh token fourni)
-- [ ] T032 [US2] Intégrer le refresh transparent dans `frontend/src/api/client.ts` (retry automatique après 401 + refresh réussi)
-- [ ] T033 [US2] Ajouter l'action logout dans `frontend/src/auth/AuthContext.tsx` (appel `/api/auth/logout`, purge des tokens locaux)
+- [x] T030 [US2] Ajouter `POST /api/auth/refresh` dans `AuthController.cs` (rotation via `AuthService`, 401 si invalide/expiré/révoqué, révocation en cascade si réutilisation d'un token révoqué détectée)
+- [x] T031 [US2] Ajouter `POST /api/auth/logout` (🔒) dans `AuthController.cs` (révoque le refresh token fourni)
+- [x] T032 [US2] Intégrer le refresh transparent dans `frontend/src/api/client.ts` (retry automatique après 401 + refresh réussi)
+- [x] T033 [US2] Ajouter l'action logout dans `frontend/src/auth/AuthContext.tsx` (appel `/api/auth/logout`, purge des tokens locaux)
 
 **Checkpoint**: Session persistante + déconnexion fonctionnelles de bout en bout.
 
@@ -107,11 +107,11 @@ Web app monorepo (cf. plan.md) : `backend/SkillForge.Api/`, `frontend/src/`.
 
 **Independent Test**: `PATCH /api/users/me` puis `POST /api/users/me/avatar` (cf. quickstart.md, scénario User Story 3).
 
-- [ ] T034 [P] [US3] Créer `backend/SkillForge.Api/Controllers/UsersController.cs` avec `GET /api/users/me` (🔒)
-- [ ] T035 [US3] Ajouter `PATCH /api/users/me` (🔒) dans `UsersController.cs` (409 si pseudo déjà pris)
-- [ ] T036 [US3] Ajouter `POST /api/users/me/avatar` (🔒) dans `UsersController.cs` (validation format/taille, appel `AvatarStorageService`, 502 si MinIO indisponible sans état partiel)
-- [ ] T037 [US3] Créer `frontend/src/pages/ProfilePage.tsx` (édition pseudo, upload avatar, affichage de l'avatar courant)
-- [ ] T038 [US3] Câbler la route `/profile` (protégée) dans `frontend/src/main.tsx`
+- [x] T034 [P] [US3] Créer `backend/SkillForge.Api/Controllers/UsersController.cs` avec `GET /api/users/me` (🔒)
+- [x] T035 [US3] Ajouter `PATCH /api/users/me` (🔒) dans `UsersController.cs` (409 si pseudo déjà pris)
+- [x] T036 [US3] Ajouter `POST /api/users/me/avatar` (🔒) dans `UsersController.cs` (validation format/taille, appel `AvatarStorageService`, 502 si MinIO indisponible sans état partiel)
+- [x] T037 [US3] Créer `frontend/src/pages/ProfilePage.tsx` (édition pseudo, upload avatar, affichage de l'avatar courant)
+- [x] T038 [US3] Câbler la route `/profile` (protégée) dans `frontend/src/main.tsx`
 
 **Checkpoint**: Édition de profil fonctionnelle de bout en bout.
 
@@ -121,10 +121,10 @@ Web app monorepo (cf. plan.md) : `backend/SkillForge.Api/`, `frontend/src/`.
 
 **Purpose**: Fiabilisation avant validation utilisateur finale de la feature.
 
-- [ ] T039 [P] Ajouter `backend/SkillForge.Api.Tests/AuthEndpointsTests.cs` (register/login/refresh/logout, via `WebApplicationFactory` + PostgreSQL de test)
-- [ ] T040 [P] Ajouter des tests Vitest ciblés sur `LoginPage.tsx` et `SignupPage.tsx` dans `frontend/src/pages/__tests__/`
-- [ ] T041 Vérifier qu'aucun secret n'apparaît dans les logs (`AuthService`, middleware d'exceptions) — cf. SC-004
-- [ ] T042 Relecture finale de `README.md` (racine) : prérequis, démarrage, endpoints principaux, lien vers `specs/001-socle-auth-bdd/`
+- [x] T039 [P] Ajouter `backend/SkillForge.Api.Tests/AuthEndpointsTests.cs` (register/login/refresh/logout, via `WebApplicationFactory` + PostgreSQL de test)
+- [x] T040 [P] Ajouter des tests Vitest ciblés sur `LoginPage.tsx` et `SignupPage.tsx` dans `frontend/src/pages/__tests__/`
+- [x] T041 Vérifier qu'aucun secret n'apparaît dans les logs (`AuthService`, middleware d'exceptions) — cf. SC-004
+- [x] T042 Relecture finale de `README.md` (racine) : prérequis, démarrage, endpoints principaux, lien vers `specs/001-socle-auth-bdd/`
 
 ---
 
