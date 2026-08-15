@@ -57,6 +57,7 @@ cd frontend && npm run test
 backend/SkillForge.Api/      # API ASP.NET Core
 backend/SkillForge.Api.Tests/
 frontend/                    # SPA React + Vite
+cli/                         # CLI de synchronisation (voir cli/README.md)
 specs/                       # Spécifications Spec Kit (spec/plan/tasks par feature)
 docker-compose.yml
 .env.example
@@ -69,7 +70,7 @@ docker-compose.yml
 | 001 | Socle auth / BDD / Docker | ✅ Implémentée |
 | 002 | Gestion des équipes | ✅ Implémentée |
 | 003 | Publication / store de ressources | ✅ Implémentée |
-| 004 | CLI de synchronisation | À venir |
+| 004 | CLI de synchronisation | ✅ Implémentée |
 | 005 | Modération admin | À venir |
 
 Voir [.specify/memory/constitution.md](.specify/memory/constitution.md) pour
