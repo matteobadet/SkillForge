@@ -1,13 +1,15 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
-import { createTeam, type TeamVisibility } from "../api/teams";
+import { createTeam, uploadTeamIcon, type TeamVisibility } from "../api/teams";
+import IconPicker, { type IconPickerValue } from "../components/IconPicker";
 
 export default function CreateTeamPage() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState<TeamVisibility>("Public");
+  const [icon, setIcon] = useState<IconPickerValue>({ preset: null, file: null });
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -16,7 +18,10 @@ export default function CreateTeamPage() {
     setError(null);
     setSubmitting(true);
     try {
-      const team = await createTeam(name, description, visibility);
+      const team = await createTeam(name, description, visibility, icon.preset);
+      if (icon.file) {
+        await uploadTeamIcon(team.id, icon.file);
+      }
       navigate(`/teams/${team.id}`);
     } catch {
       setError("Une erreur est survenue. Réessayez.");
@@ -37,6 +42,7 @@ export default function CreateTeamPage() {
           Description
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={500} />
         </label>
+        <IconPicker value={icon} onChange={setIcon} />
         <fieldset>
           <legend>Visibilité</legend>
           <label className="field field-inline">

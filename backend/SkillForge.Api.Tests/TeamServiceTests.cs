@@ -123,4 +123,33 @@ public class TeamServiceTests
 
         Assert.Equal(2, directory.Count);
     }
+
+    [Fact]
+    public async Task SetIconPresetAsync_ClearsPreviousIconObjectKey()
+    {
+        var (db, service) = CreateService();
+        var owner = await AddUserAsync(db, "owner@test.com", "owner");
+        var team = await service.CreateTeamAsync(owner.Id, "Team", null, TeamVisibility.Public);
+        await service.SetIconObjectKeyAsync(team, "teams/1/abc");
+
+        var previous = await service.SetIconPresetAsync(team, "Rocket");
+
+        Assert.Equal("teams/1/abc", previous);
+        Assert.Equal("Rocket", team.IconPreset);
+        Assert.Null(team.IconObjectKey);
+    }
+
+    [Fact]
+    public async Task SetIconObjectKeyAsync_ClearsPreviousIconPreset()
+    {
+        var (db, service) = CreateService();
+        var owner = await AddUserAsync(db, "owner@test.com", "owner");
+        var team = await service.CreateTeamAsync(owner.Id, "Team", null, TeamVisibility.Public);
+        await service.SetIconPresetAsync(team, "Rocket");
+
+        await service.SetIconObjectKeyAsync(team, "teams/1/xyz");
+
+        Assert.Null(team.IconPreset);
+        Assert.Equal("teams/1/xyz", team.IconObjectKey);
+    }
 }

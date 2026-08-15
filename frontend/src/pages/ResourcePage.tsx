@@ -7,8 +7,12 @@ import {
   getResource,
   toggleUpvote,
   updateResource,
+  uploadResourceIcon,
   type ResourceDetail,
 } from "../api/resources";
+import EntityIcon from "../components/EntityIcon";
+import IconPicker, { type IconPickerValue } from "../components/IconPicker";
+import { defaultResourceIcon } from "../icons/presets";
 
 export default function ResourcePage() {
   const { id } = useParams<{ id: string }>();
@@ -60,6 +64,18 @@ export default function ResourcePage() {
     }
   };
 
+  const handleIconChange = async (value: IconPickerValue) => {
+    setError(null);
+    try {
+      const updated = value.file
+        ? await uploadResourceIcon(resource.id, value.file)
+        : await updateResource(resource.id, { iconPreset: value.preset ?? "" });
+      setResource(updated);
+    } catch {
+      setError("Échec de la mise à jour de l'icône.");
+    }
+  };
+
   const handleDelete = async () => {
     if (!confirm(`Supprimer définitivement "${resource.name}" ?`)) return;
     await deleteResource(resource.id);
@@ -69,6 +85,7 @@ export default function ResourcePage() {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+        <EntityIcon iconUrl={resource.iconUrl} iconPreset={resource.iconPreset} fallback={defaultResourceIcon(resource.type)} />
         <h1 style={{ margin: 0 }}>{resource.name}</h1>
         <span className="badge badge-accent">{resource.type}</span>
       </div>
@@ -92,20 +109,26 @@ export default function ResourcePage() {
         <section className="card-section">
           <h2>Gestion</h2>
           {resource.canManage && (
-            <form onSubmit={handleUpdate} className="card">
-              <label className="field">
-                Nom
-                <input value={name} onChange={(e) => setName(e.target.value)} />
-              </label>
-              <label className="field">
-                Description
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
-              </label>
-              <button type="submit" className="btn-primary">
-                <Save size={16} />
-                Enregistrer
-              </button>
-            </form>
+            <>
+              <div className="card">
+                <h3>Icône</h3>
+                <IconPicker value={{ preset: resource.iconPreset, file: null }} onChange={handleIconChange} />
+              </div>
+              <form onSubmit={handleUpdate} className="card" style={{ marginTop: "var(--space-3)" }}>
+                <label className="field">
+                  Nom
+                  <input value={name} onChange={(e) => setName(e.target.value)} />
+                </label>
+                <label className="field">
+                  Description
+                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+                </label>
+                <button type="submit" className="btn-primary">
+                  <Save size={16} />
+                  Enregistrer
+                </button>
+              </form>
+            </>
           )}
           {error && <p className="alert alert-error" role="alert">{error}</p>}
           {resource.canDelete && (

@@ -30,6 +30,7 @@ var minioOptions = new MinioOptions
     SecretKey = builder.Configuration["MINIO_ROOT_PASSWORD"] ?? throw new InvalidOperationException("MINIO_ROOT_PASSWORD is required"),
     AvatarsBucket = builder.Configuration["MINIO_BUCKET_AVATARS"] ?? "avatars",
     ResourcesBucket = builder.Configuration["MINIO_BUCKET_RESOURCES"] ?? "resources",
+    IconsBucket = builder.Configuration["MINIO_BUCKET_ICONS"] ?? "icons",
     UseSsl = false,
 };
 builder.Services.Configure<MinioOptions>(o =>
@@ -40,6 +41,7 @@ builder.Services.Configure<MinioOptions>(o =>
     o.SecretKey = minioOptions.SecretKey;
     o.AvatarsBucket = minioOptions.AvatarsBucket;
     o.ResourcesBucket = minioOptions.ResourcesBucket;
+    o.IconsBucket = minioOptions.IconsBucket;
     o.UseSsl = minioOptions.UseSsl;
 });
 
@@ -114,6 +116,7 @@ using (var scope = app.Services.CreateScope())
     var objectStorage = scope.ServiceProvider.GetRequiredService<ObjectStorageService>();
     await objectStorage.EnsureBucketExistsAsync(minioOptions.AvatarsBucket);
     await objectStorage.EnsureBucketExistsAsync(minioOptions.ResourcesBucket);
+    await objectStorage.EnsureBucketExistsAsync(minioOptions.IconsBucket);
 }
 
 // ---- Pipeline ----

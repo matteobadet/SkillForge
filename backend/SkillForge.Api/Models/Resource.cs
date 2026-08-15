@@ -18,6 +18,8 @@ public class Resource
     public string? Description { get; set; }
     public ResourceType Type { get; set; }
     public required string ObjectKey { get; set; }
+    public string? IconPreset { get; set; }
+    public string? IconObjectKey { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 

@@ -10,6 +10,8 @@ public record ResourceSummaryDto(
     string PublisherPseudo,
     int UpvoteCount,
     bool UpvotedByMe,
+    string? IconPreset,
+    string? IconUrl,
     DateTimeOffset CreatedAt
 );
 
@@ -23,6 +25,8 @@ public record ResourceDetailDto(
     string PublisherPseudo,
     int UpvoteCount,
     bool UpvotedByMe,
+    string? IconPreset,
+    string? IconUrl,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
     bool CanManage,

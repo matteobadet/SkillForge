@@ -5,18 +5,20 @@ namespace SkillForge.Api.Models.Dtos;
 public record CreateTeamRequest(
     [Required, MinLength(1), MaxLength(64)] string Name,
     [MaxLength(500)] string? Description,
-    [Required] TeamVisibility Visibility
+    [Required] TeamVisibility Visibility,
+    string? IconPreset
 );
 
 public record UpdateTeamRequest(
     [MinLength(1), MaxLength(64)] string? Name,
     [MaxLength(500)] string? Description,
-    TeamVisibility? Visibility
+    TeamVisibility? Visibility,
+    string? IconPreset
 );
 
 public record TeamMemberDto(Guid UserId, string Pseudo, string? AvatarUrl, TeamRole Role);
 
-public record TeamSummaryDto(Guid Id, string Name, string? Description, TeamVisibility Visibility, int MemberCount, TeamRole? MyRole);
+public record TeamSummaryDto(Guid Id, string Name, string? Description, TeamVisibility Visibility, int MemberCount, TeamRole? MyRole, string? IconPreset, string? IconUrl);
 
 public record TeamDetailDto(
     Guid Id,
@@ -25,6 +27,8 @@ public record TeamDetailDto(
     TeamVisibility Visibility,
     int MemberCount,
     TeamRole? MyRole,
+    string? IconPreset,
+    string? IconUrl,
     DateTimeOffset CreatedAt,
     List<TeamMemberDto> Members
 );

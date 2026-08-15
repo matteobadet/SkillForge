@@ -70,6 +70,26 @@ public class ResourceService(AppDbContext db, TeamService teamService)
 
     public Task SaveChangesAsync() => db.SaveChangesAsync();
 
+    /// <returns>The previous icon object key, if any (caller deletes it from storage).</returns>
+    public async Task<string?> SetIconPresetAsync(Resource resource, string preset)
+    {
+        var previousObjectKey = resource.IconObjectKey;
+        resource.IconPreset = preset;
+        resource.IconObjectKey = null;
+        await db.SaveChangesAsync();
+        return previousObjectKey;
+    }
+
+    /// <returns>The previous icon object key, if any (caller deletes it from storage).</returns>
+    public async Task<string?> SetIconObjectKeyAsync(Resource resource, string objectKey)
+    {
+        var previousObjectKey = resource.IconObjectKey;
+        resource.IconPreset = null;
+        resource.IconObjectKey = objectKey;
+        await db.SaveChangesAsync();
+        return previousObjectKey;
+    }
+
     public async Task DeleteResourceAsync(Guid resourceId)
     {
         var resource = await db.Resources.FindAsync(resourceId);

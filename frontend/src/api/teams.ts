@@ -10,6 +10,8 @@ export interface TeamSummary {
   visibility: TeamVisibility;
   memberCount: number;
   myRole: TeamRole | null;
+  iconPreset: string | null;
+  iconUrl: string | null;
 }
 
 export interface TeamMember {
@@ -24,10 +26,10 @@ export interface TeamDetail extends TeamSummary {
   members: TeamMember[];
 }
 
-export function createTeam(name: string, description: string, visibility: TeamVisibility) {
+export function createTeam(name: string, description: string, visibility: TeamVisibility, iconPreset?: string | null) {
   return apiJson<TeamDetail>("/api/teams", {
     method: "POST",
-    body: JSON.stringify({ name, description: description || null, visibility }),
+    body: JSON.stringify({ name, description: description || null, visibility, iconPreset: iconPreset ?? null }),
   });
 }
 
@@ -43,7 +45,7 @@ export function getTeam(id: string) {
   return apiJson<TeamDetail>(`/api/teams/${id}`);
 }
 
-export function updateTeam(id: string, patch: Partial<{ name: string; description: string; visibility: TeamVisibility }>) {
+export function updateTeam(id: string, patch: Partial<{ name: string; description: string; visibility: TeamVisibility; iconPreset: string }>) {
   return apiJson<TeamDetail>(`/api/teams/${id}`, { method: "PATCH", body: JSON.stringify(patch) });
 }
 
@@ -72,4 +74,12 @@ export function regenerateInviteLink(teamId: string) {
 
 export function joinTeam(token: string) {
   return apiJson<TeamDetail>(`/api/teams/join/${token}`, { method: "POST" });
+}
+
+export async function uploadTeamIcon(teamId: string, file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await apiFetch(`/api/teams/${teamId}/icon`, { method: "POST", body: formData });
+  if (!res.ok) throw new Error("upload_icon_failed");
+  return (await res.json()) as TeamDetail;
 }

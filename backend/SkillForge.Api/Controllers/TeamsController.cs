@@ -14,15 +14,26 @@ namespace SkillForge.Api.Controllers;
 [Route("api/teams")]
 public class TeamsController(TeamService teamService, ObjectStorageService objectStorage, IOptions<MinioOptions> minioOptions) : ControllerBase
 {
+    private static readonly HashSet<string> AllowedIconContentTypes = new() { "image/jpeg", "image/png", "image/webp" };
+    private const long MaxIconSizeBytes = 2 * 1024 * 1024;
+    private string IconsBucket => minioOptions.Value.IconsBucket;
     private bool IsAdmin => User.IsInRole(UserRole.Admin.ToString());
 
-    private static TeamSummaryDto ToSummaryDto(Team team, Guid callerId) => new(
+    private static bool IsImage(IFormFile file) =>
+        AllowedIconContentTypes.Contains(file.ContentType);
+
+    private async Task<string?> ResolveIconUrlAsync(Team team) =>
+        string.IsNullOrEmpty(team.IconObjectKey) ? null : await objectStorage.GetPresignedUrlAsync(IconsBucket, team.IconObjectKey);
+
+    private async Task<TeamSummaryDto> ToSummaryDtoAsync(Team team, Guid callerId) => new(
         team.Id,
         team.Name,
         team.Description,
         team.Visibility,
         team.Members.Count,
-        team.Members.FirstOrDefault(m => m.UserId == callerId)?.Role
+        team.Members.FirstOrDefault(m => m.UserId == callerId)?.Role,
+        team.IconPreset,
+        await ResolveIconUrlAsync(team)
     );
 
     private async Task<TeamDetailDto> ToDetailDtoAsync(Team team, Guid callerId)
@@ -45,6 +56,8 @@ public class TeamsController(TeamService teamService, ObjectStorageService objec
             team.Visibility,
             team.Members.Count,
             team.Members.FirstOrDefault(m => m.UserId == callerId)?.Role,
+            team.IconPreset,
+            await ResolveIconUrlAsync(team),
             team.CreatedAt,
             members
         );
@@ -53,8 +66,17 @@ public class TeamsController(TeamService teamService, ObjectStorageService objec
     [HttpPost]
     public async Task<ActionResult<TeamDetailDto>> Create(CreateTeamRequest request)
     {
+        if (request.IconPreset is not null && !IconPresets.Known.Contains(request.IconPreset))
+        {
+            return BadRequest(new { error = "invalid_icon_preset", message = "Icône de palette inconnue." });
+        }
+
         var userId = User.GetUserId();
         var created = await teamService.CreateTeamAsync(userId, request.Name, request.Description, request.Visibility);
+        if (request.IconPreset is not null)
+        {
+            await teamService.SetIconPresetAsync(created, request.IconPreset);
+        }
         var team = await teamService.GetVisibleTeamAsync(created.Id, userId, IsAdmin);
         return Created(string.Empty, await ToDetailDtoAsync(team!, userId));
     }
@@ -64,7 +86,9 @@ public class TeamsController(TeamService teamService, ObjectStorageService objec
     {
         var userId = User.GetUserId();
         var teams = await teamService.ListDirectoryTeamsAsync(IsAdmin);
-        return Ok(teams.Select(t => ToSummaryDto(t, userId)).ToList());
+        var dtos = new List<TeamSummaryDto>();
+        foreach (var t in teams) dtos.Add(await ToSummaryDtoAsync(t, userId));
+        return Ok(dtos);
     }
 
     [HttpGet("mine")]
@@ -72,7 +96,9 @@ public class TeamsController(TeamService teamService, ObjectStorageService objec
     {
         var userId = User.GetUserId();
         var teams = await teamService.ListMyTeamsAsync(userId);
-        return Ok(teams.Select(t => ToSummaryDto(t, userId)).ToList());
+        var dtos = new List<TeamSummaryDto>();
+        foreach (var t in teams) dtos.Add(await ToSummaryDtoAsync(t, userId));
+        return Ok(dtos);
     }
 
     [HttpGet("{id:guid}")]
@@ -97,7 +123,55 @@ public class TeamsController(TeamService teamService, ObjectStorageService objec
         if (request.Description is not null) team.Description = request.Description;
         if (request.Visibility is not null) team.Visibility = request.Visibility.Value;
 
+        if (request.IconPreset is not null)
+        {
+            if (!IconPresets.Known.Contains(request.IconPreset))
+            {
+                return BadRequest(new { error = "invalid_icon_preset", message = "Icône de palette inconnue." });
+            }
+            var previousKey = await teamService.SetIconPresetAsync(team, request.IconPreset);
+            if (!string.IsNullOrEmpty(previousKey))
+            {
+                await objectStorage.DeleteAsync(IconsBucket, previousKey);
+            }
+        }
+
         await teamService.SaveChangesAsync();
+        return Ok(await ToDetailDtoAsync(team, userId));
+    }
+
+    [HttpPost("{id:guid}/icon")]
+    public async Task<ActionResult<TeamDetailDto>> UploadIcon(Guid id, IFormFile file)
+    {
+        var userId = User.GetUserId();
+        if (!await teamService.IsOwnerAsync(id, userId)) return Forbid();
+
+        var team = await teamService.GetVisibleTeamAsync(id, userId, IsAdmin);
+        if (team is null) return NotFound();
+
+        if (file is null || file.Length == 0 || file.Length > MaxIconSizeBytes || !IsImage(file))
+        {
+            return BadRequest(new { error = "invalid_file", message = "Image requise (jpeg/png/webp, 2 Mo max)." });
+        }
+
+        string newObjectKey;
+        try
+        {
+            await using var stream = file.OpenReadStream();
+            newObjectKey = $"teams/{id}/{Guid.NewGuid()}";
+            await objectStorage.UploadAsync(IconsBucket, newObjectKey, stream, file.Length, file.ContentType);
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway, new { error = "storage_unavailable", message = "Stockage indisponible, aucune modification appliquée." });
+        }
+
+        var previousKey = await teamService.SetIconObjectKeyAsync(team, newObjectKey);
+        if (!string.IsNullOrEmpty(previousKey))
+        {
+            await objectStorage.DeleteAsync(IconsBucket, previousKey);
+        }
+
         return Ok(await ToDetailDtoAsync(team, userId));
     }
 

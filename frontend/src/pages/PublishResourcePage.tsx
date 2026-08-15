@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { UploadCloud } from "lucide-react";
-import { publishResource, type ResourceType } from "../api/resources";
+import { publishResource, uploadResourceIcon, type ResourceType } from "../api/resources";
+import IconPicker, { type IconPickerValue } from "../components/IconPicker";
 
 export default function PublishResourcePage() {
   const { teamId } = useParams<{ teamId: string }>();
@@ -10,6 +11,7 @@ export default function PublishResourcePage() {
   const [description, setDescription] = useState("");
   const [type, setType] = useState<ResourceType>("Skill");
   const [file, setFile] = useState<File | null>(null);
+  const [icon, setIcon] = useState<IconPickerValue>({ preset: null, file: null });
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -19,7 +21,10 @@ export default function PublishResourcePage() {
     setError(null);
     setSubmitting(true);
     try {
-      const resource = await publishResource(teamId, name, description, type, file);
+      const resource = await publishResource(teamId, name, description, type, file, icon.preset);
+      if (icon.file) {
+        await uploadResourceIcon(resource.id, icon.file);
+      }
       navigate(`/resources/${resource.id}`);
     } catch {
       setError("Échec de la publication (nom déjà pris, ou fichier invalide — .zip, 50 Mo max).");
@@ -48,6 +53,7 @@ export default function PublishResourcePage() {
             <option value="Agent">Agent</option>
           </select>
         </label>
+        <IconPicker value={icon} onChange={setIcon} />
         <label className="field">
           Archive (.zip, 50 Mo max)
           <input type="file" accept=".zip" onChange={(e) => setFile(e.target.files?.[0] ?? null)} required />

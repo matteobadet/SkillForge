@@ -2,29 +2,32 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Lock, Plus, Globe } from "lucide-react";
 import { listMyTeams, listPublicTeams, type TeamSummary } from "../api/teams";
+import EntityIcon from "../components/EntityIcon";
+import { DEFAULT_TEAM_ICON } from "../icons/presets";
 
 function TeamList({ teams }: { teams: TeamSummary[] }) {
   if (teams.length === 0) return <p className="empty-state">Aucune équipe.</p>;
   return (
-    <ul className="list">
+    <div className="card-grid">
       {teams.map((t) => (
-        <li key={t.id}>
-          <Link to={`/teams/${t.id}`} className="list-item">
-            <div className="list-item-main">
-              <span className="list-item-title">{t.name}</span>
-              <span className="list-item-meta">
-                {t.memberCount} membre{t.memberCount > 1 ? "s" : ""}
-                {t.myRole ? ` · ${t.myRole}` : ""}
+        <Link to={`/teams/${t.id}`} key={t.id} className="entity-card">
+          <EntityIcon iconUrl={t.iconUrl} iconPreset={t.iconPreset} fallback={DEFAULT_TEAM_ICON} />
+          <div className="entity-card-body">
+            <span className="entity-card-title">{t.name}</span>
+            <span className="entity-card-meta">
+              {t.memberCount} membre{t.memberCount > 1 ? "s" : ""}
+              {t.myRole ? ` · ${t.myRole}` : ""}
+            </span>
+            <div className="entity-card-footer">
+              <span className="badge">
+                {t.visibility === "Public" ? <Globe size={12} /> : <Lock size={12} />}
+                {t.visibility === "Public" ? "Publique" : "Privée"}
               </span>
             </div>
-            <span className="badge">
-              {t.visibility === "Public" ? <Globe size={12} /> : <Lock size={12} />}
-              {t.visibility === "Public" ? "Publique" : "Privée"}
-            </span>
-          </Link>
-        </li>
+          </div>
+        </Link>
       ))}
-    </ul>
+    </div>
   );
 }
 

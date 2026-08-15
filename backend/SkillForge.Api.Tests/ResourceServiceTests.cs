@@ -127,4 +127,35 @@ public class ResourceServiceTests
 
         Assert.False(await resources.CanManageAsync(resource, admin.Id));
     }
+
+    [Fact]
+    public async Task SetIconPresetAsync_ClearsPreviousIconObjectKey()
+    {
+        var (db, resources, teams) = CreateServices();
+        var owner = await AddUserAsync(db, "owner@test.com", "owner");
+        var team = await teams.CreateTeamAsync(owner.Id, "Team", null, TeamVisibility.Public);
+        var resource = await resources.CreateResourceAsync(team.Id, owner.Id, "Res", null, ResourceType.Skill, "key");
+        await resources.SetIconObjectKeyAsync(resource, "resources/1/abc");
+
+        var previous = await resources.SetIconPresetAsync(resource, "Bot");
+
+        Assert.Equal("resources/1/abc", previous);
+        Assert.Equal("Bot", resource.IconPreset);
+        Assert.Null(resource.IconObjectKey);
+    }
+
+    [Fact]
+    public async Task SetIconObjectKeyAsync_ClearsPreviousIconPreset()
+    {
+        var (db, resources, teams) = CreateServices();
+        var owner = await AddUserAsync(db, "owner@test.com", "owner");
+        var team = await teams.CreateTeamAsync(owner.Id, "Team", null, TeamVisibility.Public);
+        var resource = await resources.CreateResourceAsync(team.Id, owner.Id, "Res", null, ResourceType.Skill, "key");
+        await resources.SetIconPresetAsync(resource, "Bot");
+
+        await resources.SetIconObjectKeyAsync(resource, "resources/1/xyz");
+
+        Assert.Null(resource.IconPreset);
+        Assert.Equal("resources/1/xyz", resource.IconObjectKey);
+    }
 }

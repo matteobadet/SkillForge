@@ -24,6 +24,26 @@ public class TeamService(AppDbContext db)
 
     public Task SaveChangesAsync() => db.SaveChangesAsync();
 
+    /// <returns>The previous icon object key, if any (caller deletes it from storage).</returns>
+    public async Task<string?> SetIconPresetAsync(Team team, string preset)
+    {
+        var previousObjectKey = team.IconObjectKey;
+        team.IconPreset = preset;
+        team.IconObjectKey = null;
+        await db.SaveChangesAsync();
+        return previousObjectKey;
+    }
+
+    /// <returns>The previous icon object key, if any (caller deletes it from storage).</returns>
+    public async Task<string?> SetIconObjectKeyAsync(Team team, string objectKey)
+    {
+        var previousObjectKey = team.IconObjectKey;
+        team.IconPreset = null;
+        team.IconObjectKey = objectKey;
+        await db.SaveChangesAsync();
+        return previousObjectKey;
+    }
+
     public async Task DeleteTeamAsync(Guid teamId)
     {
         var team = await db.Teams.FindAsync(teamId);

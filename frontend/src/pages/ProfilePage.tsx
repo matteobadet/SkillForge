@@ -8,6 +8,7 @@ export default function ProfilePage() {
   const [pseudo, setPseudo] = useState(user?.pseudo ?? "");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
   if (!user) return null;
 
@@ -48,6 +49,7 @@ export default function ProfilePage() {
         throw new ApiError(response.status, await response.json().catch(() => null));
       }
       await refreshUser();
+      setAvatarFailed(false);
       setMessage("Avatar mis à jour.");
     } catch {
       setError("Échec de l'upload de l'avatar.");
@@ -58,8 +60,16 @@ export default function ProfilePage() {
     <div>
       <h1>Mon profil</h1>
       <div className="card" style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
-        {user.avatarUrl ? (
-          <img src={user.avatarUrl} alt="Avatar" width={64} height={64} className="avatar" style={{ width: 64, height: 64 }} />
+        {user.avatarUrl && !avatarFailed ? (
+          <img
+            src={user.avatarUrl}
+            alt="Avatar"
+            width={64}
+            height={64}
+            className="avatar"
+            style={{ width: 64, height: 64 }}
+            onError={() => setAvatarFailed(true)}
+          />
         ) : (
           <div className="avatar" style={{ width: 64, height: 64, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-subtle)" }}>
             {user.pseudo.slice(0, 1).toUpperCase()}
