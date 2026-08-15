@@ -66,6 +66,7 @@ builder.Services.AddKeyedSingleton<IMinioClient>("public", (_, _) => new MinioCl
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<AvatarStorageService>();
+builder.Services.AddScoped<TeamService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -94,7 +95,8 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(frontendOrigin).AllowAnyHeader().AllowAnyMethod());
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
