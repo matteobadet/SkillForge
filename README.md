@@ -38,8 +38,12 @@ Après inscription d'un compte via l'UI ou `/api/auth/register`, promouvoir
 manuellement en base :
 
 ```sql
-UPDATE users SET role = 'Admin' WHERE email = 'vous@example.com';
+UPDATE users SET "Role" = 'Admin' WHERE "Email" = 'vous@example.com';
 ```
+
+(Les noms de colonnes sont en PascalCase, générés tels quels par EF Core —
+d'où les guillemets doubles, obligatoires pour PostgreSQL avec une casse
+mixte.)
 
 ## Tests
 
@@ -71,7 +75,7 @@ docker-compose.yml
 | 002 | Gestion des équipes | ✅ Implémentée |
 | 003 | Publication / store de ressources | ✅ Implémentée |
 | 004 | CLI de synchronisation | ✅ Implémentée |
-| 005 | Modération admin | À venir |
+| 005 | Modération admin | ✅ Implémentée |
 
 Voir [.specify/memory/constitution.md](.specify/memory/constitution.md) pour
 les principes directeurs du projet.

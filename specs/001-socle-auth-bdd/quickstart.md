@@ -80,7 +80,7 @@ Après inscription d'un premier compte via `/api/auth/register`, un opérateur
 le promeut manuellement en base :
 
 ```sql
-UPDATE users SET role = 'Admin' WHERE email = 'ami@example.com';
+UPDATE users SET "Role" = 'Admin' WHERE "Email" = 'ami@example.com';
 ```
 
 Aucun endpoint applicatif ne permet cette promotion dans ce socle (décision

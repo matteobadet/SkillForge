@@ -53,8 +53,12 @@ public class TeamService(AppDbContext db)
             t.Members.Any(m => m.UserId == userId));
     }
 
-    public async Task<List<Team>> ListPublicTeamsAsync() =>
-        await db.Teams.Where(t => t.Visibility == TeamVisibility.Public).Include(t => t.Members).ToListAsync();
+    /// <summary>Team directory: all teams for an Admin (cf. FR-008), public-only otherwise.</summary>
+    public async Task<List<Team>> ListDirectoryTeamsAsync(bool isAdmin)
+    {
+        var query = isAdmin ? db.Teams : db.Teams.Where(t => t.Visibility == TeamVisibility.Public);
+        return await query.Include(t => t.Members).ToListAsync();
+    }
 
     public async Task<List<Team>> ListMyTeamsAsync(Guid userId) =>
         await db.Teams.Where(t => t.Members.Any(m => m.UserId == userId)).Include(t => t.Members).ToListAsync();

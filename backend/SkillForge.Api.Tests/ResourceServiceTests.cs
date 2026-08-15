@@ -111,4 +111,20 @@ public class ResourceServiceTests
         Assert.True(await resources.NameTakenInTeamAsync(teamA.Id, "Res"));
         Assert.False(await resources.NameTakenInTeamAsync(teamB.Id, "Res"));
     }
+
+    [Fact]
+    public async Task CanManageAsync_StaysFalseForAdmin_WhoIsNeitherPublisherNorOwner()
+    {
+        // The Admin moderation override (delete-only) lives in ResourcesController,
+        // not in CanManageAsync — this asserts the service itself grants no edit
+        // rights to Admin, so a future misuse of CanManageAsync for PATCH can't
+        // accidentally let Admin edit third-party content (cf. spec FR-002).
+        var (db, resources, teams) = CreateServices();
+        var owner = await AddUserAsync(db, "owner@test.com", "owner");
+        var admin = await AddUserAsync(db, "admin@test.com", "admin");
+        var team = await teams.CreateTeamAsync(owner.Id, "Team", null, TeamVisibility.Public);
+        var resource = await resources.CreateResourceAsync(team.Id, owner.Id, "Res", null, ResourceType.Skill, "key");
+
+        Assert.False(await resources.CanManageAsync(resource, admin.Id));
+    }
 }

@@ -25,7 +25,8 @@ public record ResourceDetailDto(
     bool UpvotedByMe,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
-    bool CanManage
+    bool CanManage,
+    bool CanDelete
 );
 
 public record UpvoteResponse(int UpvoteCount, bool UpvotedByMe);

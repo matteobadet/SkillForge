@@ -78,22 +78,28 @@ export default function ResourcePage() {
         {resource.upvotedByMe ? "Retirer mon upvote" : "Upvote"} ({resource.upvoteCount})
       </button>
 
-      {resource.canManage && (
+      {(resource.canManage || resource.canDelete) && (
         <section>
           <h2>Gestion</h2>
-          <form onSubmit={handleUpdate}>
-            <label>
-              Nom
-              <input value={name} onChange={(e) => setName(e.target.value)} />
-            </label>
-            <label>
-              Description
-              <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
-            </label>
-            <button type="submit">Enregistrer</button>
-          </form>
+          {resource.canManage && (
+            <form onSubmit={handleUpdate}>
+              <label>
+                Nom
+                <input value={name} onChange={(e) => setName(e.target.value)} />
+              </label>
+              <label>
+                Description
+                <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+              </label>
+              <button type="submit">Enregistrer</button>
+            </form>
+          )}
           {error && <p role="alert">{error}</p>}
-          <button type="button" onClick={handleDelete}>Supprimer</button>
+          {resource.canDelete && (
+            <button type="button" onClick={handleDelete}>
+              {resource.canManage ? "Supprimer" : "Supprimer (modération admin)"}
+            </button>
+          )}
         </section>
       )}
     </div>

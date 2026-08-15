@@ -18,6 +18,7 @@ export interface ResourceSummary {
 export interface ResourceDetail extends ResourceSummary {
   updatedAt: string;
   canManage: boolean;
+  canDelete: boolean;
 }
 
 export async function publishResource(teamId: string, name: string, description: string, type: ResourceType, file: File) {

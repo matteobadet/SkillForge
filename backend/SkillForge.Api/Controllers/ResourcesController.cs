@@ -44,8 +44,9 @@ public class ResourcesController(
     {
         var summary = await ToSummaryDtoAsync(r, callerId);
         var canManage = await resourceService.CanManageAsync(r, callerId);
+        var canDelete = canManage || IsAdmin;
         return new ResourceDetailDto(summary.Id, summary.TeamId, summary.TeamName, summary.Name, summary.Description,
-            summary.Type, summary.PublisherPseudo, summary.UpvoteCount, summary.UpvotedByMe, summary.CreatedAt, r.UpdatedAt, canManage);
+            summary.Type, summary.PublisherPseudo, summary.UpvoteCount, summary.UpvotedByMe, summary.CreatedAt, r.UpdatedAt, canManage, canDelete);
     }
 
     [HttpPost("api/teams/{teamId:guid}/resources")]
@@ -176,7 +177,7 @@ public class ResourcesController(
         var userId = User.GetUserId();
         var resource = await resourceService.GetVisibleResourceAsync(id, userId, IsAdmin);
         if (resource is null) return NotFound();
-        if (!await resourceService.CanManageAsync(resource, userId)) return Forbid();
+        if (!await resourceService.CanManageAsync(resource, userId) && !IsAdmin) return Forbid();
 
         await resourceService.DeleteResourceAsync(id);
         await objectStorage.DeleteAsync(ResourcesBucket, resource.ObjectKey);

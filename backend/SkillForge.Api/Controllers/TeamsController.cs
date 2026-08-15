@@ -63,7 +63,7 @@ public class TeamsController(TeamService teamService, ObjectStorageService objec
     public async Task<ActionResult<List<TeamSummaryDto>>> ListPublic()
     {
         var userId = User.GetUserId();
-        var teams = await teamService.ListPublicTeamsAsync();
+        var teams = await teamService.ListDirectoryTeamsAsync(IsAdmin);
         return Ok(teams.Select(t => ToSummaryDto(t, userId)).ToList());
     }
 

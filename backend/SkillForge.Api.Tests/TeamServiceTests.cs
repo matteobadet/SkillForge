@@ -96,4 +96,31 @@ public class TeamServiceTests
 
         Assert.Equal(2, visibleToAdmin.Count);
     }
+
+    [Fact]
+    public async Task ListDirectoryTeamsAsync_ReturnsOnlyPublicTeams_ForNonAdmin()
+    {
+        var (db, service) = CreateService();
+        var owner = await AddUserAsync(db, "owner@test.com", "owner");
+        await service.CreateTeamAsync(owner.Id, "Public Team", null, TeamVisibility.Public);
+        await service.CreateTeamAsync(owner.Id, "Private Team", null, TeamVisibility.Prive);
+
+        var directory = await service.ListDirectoryTeamsAsync(isAdmin: false);
+
+        Assert.Single(directory);
+        Assert.Equal("Public Team", directory[0].Name);
+    }
+
+    [Fact]
+    public async Task ListDirectoryTeamsAsync_ReturnsAllTeams_ForAdmin()
+    {
+        var (db, service) = CreateService();
+        var owner = await AddUserAsync(db, "owner@test.com", "owner");
+        await service.CreateTeamAsync(owner.Id, "Public Team", null, TeamVisibility.Public);
+        await service.CreateTeamAsync(owner.Id, "Private Team", null, TeamVisibility.Prive);
+
+        var directory = await service.ListDirectoryTeamsAsync(isAdmin: true);
+
+        Assert.Equal(2, directory.Count);
+    }
 }
