@@ -458,6 +458,14 @@ button:disabled {
   font-size: 14px;
 }
 
+.entity-description {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: var(--space-3) 0 var(--space-4);
+  max-width: 640px;
+}
+
 .empty-state {
   padding: var(--space-5);
   text-align: center;

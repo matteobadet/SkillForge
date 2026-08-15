@@ -116,7 +116,7 @@ export default function TeamPage() {
           {team.visibility === "Public" ? "Publique" : "Privée"}
         </span>
       </div>
-      {team.description && <p className="muted">{team.description}</p>}
+      {team.description && <p className="entity-description">{team.description}</p>}
 
       <h2>Membres ({team.members.length})</h2>
       <ul className="list">

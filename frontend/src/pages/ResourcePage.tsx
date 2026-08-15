@@ -89,7 +89,7 @@ export default function ResourcePage() {
         <h1 style={{ margin: 0 }}>{resource.name}</h1>
         <span className="badge badge-accent">{resource.type}</span>
       </div>
-      {resource.description && <p className="muted">{resource.description}</p>}
+      {resource.description && <p className="entity-description">{resource.description}</p>}
       <p className="list-item-meta">
         Équipe : <Link to={`/teams/${resource.teamId}`}>{resource.teamName}</Link> · Publié par {resource.publisherPseudo}
       </p>
