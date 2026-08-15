@@ -23,16 +23,14 @@ export interface ResourceDetail extends ResourceSummary {
   canDelete: boolean;
 }
 
-export async function publishResource(teamId: string, name: string, description: string, type: ResourceType, file: File, iconPreset?: string | null) {
+export function publishResource(teamId: string, name: string, description: string, type: ResourceType, file: File, iconPreset?: string | null) {
   const formData = new FormData();
   formData.append("name", name);
   formData.append("description", description);
   formData.append("type", type);
   formData.append("file", file);
   if (iconPreset) formData.append("iconPreset", iconPreset);
-  const res = await apiFetch(`/api/teams/${teamId}/resources`, { method: "POST", body: formData });
-  if (!res.ok) throw new Error("publish_failed");
-  return (await res.json()) as ResourceDetail;
+  return apiJson<ResourceDetail>(`/api/teams/${teamId}/resources`, { method: "POST", body: formData });
 }
 
 export function listTeamResources(teamId: string) {
@@ -51,15 +49,13 @@ export function getDownloadUrl(id: string) {
   return apiJson<{ downloadUrl: string }>(`/api/resources/${id}/download`);
 }
 
-export async function updateResource(id: string, patch: { name?: string; description?: string; iconPreset?: string; file?: File }) {
+export function updateResource(id: string, patch: { name?: string; description?: string; iconPreset?: string; file?: File }) {
   const formData = new FormData();
   if (patch.name !== undefined) formData.append("name", patch.name);
   if (patch.description !== undefined) formData.append("description", patch.description);
   if (patch.iconPreset !== undefined) formData.append("iconPreset", patch.iconPreset);
   if (patch.file) formData.append("file", patch.file);
-  const res = await apiFetch(`/api/resources/${id}`, { method: "PATCH", body: formData });
-  if (!res.ok) throw new Error("update_failed");
-  return (await res.json()) as ResourceDetail;
+  return apiJson<ResourceDetail>(`/api/resources/${id}`, { method: "PATCH", body: formData });
 }
 
 export async function deleteResource(id: string) {

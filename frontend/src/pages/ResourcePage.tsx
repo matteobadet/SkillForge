@@ -1,6 +1,7 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowBigUp, Download, Save, ShieldAlert, Trash2 } from "lucide-react";
+import { ArrowBigUp, Download, ShieldAlert, Trash2 } from "lucide-react";
+import { ApiError } from "../api/client";
 import {
   deleteResource,
   getDownloadUrl,
@@ -12,15 +13,22 @@ import {
 } from "../api/resources";
 import EntityIcon from "../components/EntityIcon";
 import IconPicker, { type IconPickerValue } from "../components/IconPicker";
+import InlineEditable from "../components/InlineEditable";
 import { defaultResourceIcon } from "../icons/presets";
+
+function messageOf(err: unknown, fallback: string): string {
+  if (err instanceof ApiError) {
+    const body = err.body as { message?: string } | null;
+    if (body?.message) return body.message;
+  }
+  return fallback;
+}
 
 export default function ResourcePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [resource, setResource] = useState<ResourceDetail | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
@@ -28,8 +36,6 @@ export default function ResourcePage() {
     try {
       const r = await getResource(id);
       setResource(r);
-      setName(r.name);
-      setDescription(r.description ?? "");
     } catch {
       setNotFound(true);
     }
@@ -53,14 +59,21 @@ export default function ResourcePage() {
     setResource({ ...resource, upvoteCount: result.upvoteCount, upvotedByMe: result.upvotedByMe });
   };
 
-  const handleUpdate = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const handleSaveName = async (value: string) => {
     try {
-      const updated = await updateResource(resource.id, { name, description });
+      const updated = await updateResource(resource.id, { name: value });
       setResource(updated);
-    } catch {
-      setError("Échec de la mise à jour (nom déjà pris ?).");
+    } catch (err) {
+      throw new Error(messageOf(err, "Échec de la mise à jour du nom."));
+    }
+  };
+
+  const handleSaveDescription = async (value: string) => {
+    try {
+      const updated = await updateResource(resource.id, { description: value });
+      setResource(updated);
+    } catch (err) {
+      throw new Error(messageOf(err, "Échec de la mise à jour de la description."));
     }
   };
 
@@ -86,10 +99,29 @@ export default function ResourcePage() {
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
         <EntityIcon iconUrl={resource.iconUrl} iconPreset={resource.iconPreset} fallback={defaultResourceIcon(resource.type)} />
-        <h1 style={{ margin: 0 }}>{resource.name}</h1>
+        <InlineEditable
+          as="h1"
+          value={resource.name}
+          onSave={handleSaveName}
+          canEdit={resource.canManage}
+          ariaLabel="le nom de la ressource"
+          emptyText=""
+          required
+          maxLength={100}
+        />
         <span className="badge badge-accent">{resource.type}</span>
       </div>
-      {resource.description && <p className="entity-description">{resource.description}</p>}
+      <InlineEditable
+        as="p"
+        className="entity-description"
+        value={resource.description ?? ""}
+        onSave={handleSaveDescription}
+        canEdit={resource.canManage}
+        ariaLabel="la description de la ressource"
+        emptyText={resource.canManage ? "Ajouter une description..." : ""}
+        multiline
+        maxLength={500}
+      />
       <p className="list-item-meta">
         Équipe : <Link to={`/teams/${resource.teamId}`}>{resource.teamName}</Link> · Publié par {resource.publisherPseudo}
       </p>
@@ -109,26 +141,10 @@ export default function ResourcePage() {
         <section className="card-section">
           <h2>Gestion</h2>
           {resource.canManage && (
-            <>
-              <div className="card">
-                <h3>Icône</h3>
-                <IconPicker value={{ preset: resource.iconPreset, file: null }} onChange={handleIconChange} />
-              </div>
-              <form onSubmit={handleUpdate} className="card" style={{ marginTop: "var(--space-3)" }}>
-                <label className="field">
-                  Nom
-                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-                </label>
-                <label className="field">
-                  Description
-                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
-                </label>
-                <button type="submit" className="btn-primary">
-                  <Save size={16} />
-                  Enregistrer
-                </button>
-              </form>
-            </>
+            <div className="card">
+              <h3>Icône</h3>
+              <IconPicker value={{ preset: resource.iconPreset, file: null }} onChange={handleIconChange} />
+            </div>
           )}
           {error && <p className="alert alert-error" role="alert">{error}</p>}
           {resource.canDelete && (

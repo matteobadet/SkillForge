@@ -1,6 +1,7 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowBigUp, Copy, LogOut, Plus, RefreshCw, Save, Trash2, UserMinus, Lock, Globe } from "lucide-react";
+import { ArrowBigUp, Copy, LogOut, Plus, RefreshCw, Trash2, UserMinus, Lock, Globe } from "lucide-react";
+import { ApiError } from "../api/client";
 import {
   deleteTeam,
   getInviteLink,
@@ -16,7 +17,16 @@ import { listTeamResources, type ResourceSummary } from "../api/resources";
 import { useAuth } from "../auth/AuthContext";
 import EntityIcon from "../components/EntityIcon";
 import IconPicker, { type IconPickerValue } from "../components/IconPicker";
+import InlineEditable from "../components/InlineEditable";
 import { DEFAULT_TEAM_ICON, defaultResourceIcon } from "../icons/presets";
+
+function messageOf(err: unknown, fallback: string): string {
+  if (err instanceof ApiError) {
+    const body = err.body as { message?: string } | null;
+    if (body?.message) return body.message;
+  }
+  return fallback;
+}
 
 export default function TeamPage() {
   const { id } = useParams<{ id: string }>();
@@ -27,8 +37,6 @@ export default function TeamPage() {
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [failedAvatars, setFailedAvatars] = useState<Set<string>>(new Set());
 
   const isOwner = team?.myRole === "Owner";
@@ -39,8 +47,6 @@ export default function TeamPage() {
     try {
       const t = await getTeam(id);
       setTeam(t);
-      setName(t.name);
-      setDescription(t.description ?? "");
       if (t.myRole === "Owner") {
         const link = await getInviteLink(id);
         setInviteUrl(link.inviteUrl);
@@ -60,14 +66,21 @@ export default function TeamPage() {
   if (notFound) return <p className="empty-state">Équipe introuvable.</p>;
   if (!team) return <p>Chargement...</p>;
 
-  const handleUpdate = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const handleSaveName = async (value: string) => {
     try {
-      const updated = await updateTeam(team.id, { name, description });
+      const updated = await updateTeam(team.id, { name: value });
       setTeam(updated);
-    } catch {
-      setError("Échec de la mise à jour.");
+    } catch (err) {
+      throw new Error(messageOf(err, "Échec de la mise à jour du nom."));
+    }
+  };
+
+  const handleSaveDescription = async (value: string) => {
+    try {
+      const updated = await updateTeam(team.id, { description: value });
+      setTeam(updated);
+    } catch (err) {
+      throw new Error(messageOf(err, "Échec de la mise à jour de la description."));
     }
   };
 
@@ -110,13 +123,32 @@ export default function TeamPage() {
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
         <EntityIcon iconUrl={team.iconUrl} iconPreset={team.iconPreset} fallback={DEFAULT_TEAM_ICON} />
-        <h1 style={{ margin: 0 }}>{team.name}</h1>
+        <InlineEditable
+          as="h1"
+          value={team.name}
+          onSave={handleSaveName}
+          canEdit={isOwner}
+          ariaLabel="le nom de l'équipe"
+          emptyText=""
+          required
+          maxLength={64}
+        />
         <span className="badge">
           {team.visibility === "Public" ? <Globe size={12} /> : <Lock size={12} />}
           {team.visibility === "Public" ? "Publique" : "Privée"}
         </span>
       </div>
-      {team.description && <p className="entity-description">{team.description}</p>}
+      <InlineEditable
+        as="p"
+        className="entity-description"
+        value={team.description ?? ""}
+        onSave={handleSaveDescription}
+        canEdit={isOwner}
+        ariaLabel="la description de l'équipe"
+        emptyText={isOwner ? "Ajouter une description..." : ""}
+        multiline
+        maxLength={500}
+      />
 
       <h2>Membres ({team.members.length})</h2>
       <ul className="list">
@@ -165,6 +197,7 @@ export default function TeamPage() {
               <div className="entity-card-body">
                 <span className="entity-card-title">{r.name}</span>
                 <span className="entity-card-meta">par {r.publisherPseudo}</span>
+                {r.description && <p className="entity-card-snippet">{r.description}</p>}
                 <div className="entity-card-footer">
                   <span className="badge">
                     <ArrowBigUp size={12} />
@@ -212,22 +245,6 @@ export default function TeamPage() {
             <h3>Icône</h3>
             <IconPicker value={{ preset: team.iconPreset, file: null }} onChange={handleIconChange} />
           </div>
-
-          <form onSubmit={handleUpdate} className="card" style={{ marginTop: "var(--space-3)" }}>
-            <h3>Modifier l'équipe</h3>
-            <label className="field">
-              Nom
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} maxLength={64} />
-            </label>
-            <label className="field">
-              Description
-              <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={500} />
-            </label>
-            <button type="submit" className="btn-primary">
-              <Save size={16} />
-              Enregistrer
-            </button>
-          </form>
 
           {error && <p className="alert alert-error" role="alert">{error}</p>}
 

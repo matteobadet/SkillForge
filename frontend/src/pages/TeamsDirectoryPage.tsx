@@ -19,6 +19,7 @@ function TeamList({ teams, emptyMessage }: { teams: TeamSummary[]; emptyMessage:
               {t.memberCount} membre{t.memberCount > 1 ? "s" : ""}
               {t.myRole ? ` · ${t.myRole}` : ""}
             </span>
+            {t.description && <p className="entity-card-snippet">{t.description}</p>}
             <div className="entity-card-footer">
               <span className="badge">
                 {t.visibility === "Public" ? <Globe size={12} /> : <Lock size={12} />}

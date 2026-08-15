@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { UploadCloud } from "lucide-react";
+import { ApiError } from "../api/client";
 import { publishResource, uploadResourceIcon, type ResourceType } from "../api/resources";
 import IconPicker, { type IconPickerValue } from "../components/IconPicker";
 import FileInput from "../components/FileInput";
@@ -27,8 +28,9 @@ export default function PublishResourcePage() {
         await uploadResourceIcon(resource.id, icon.file);
       }
       navigate(`/resources/${resource.id}`);
-    } catch {
-      setError("Échec de la publication (nom déjà pris, ou fichier invalide — .zip, 50 Mo max).");
+    } catch (err) {
+      const body = err instanceof ApiError ? (err.body as { message?: string } | null) : null;
+      setError(body?.message ?? "Échec de la publication. Réessayez.");
     } finally {
       setSubmitting(false);
     }

@@ -1,59 +1,47 @@
-import { useState, type FormEvent } from "react";
-import { Save } from "lucide-react";
+import { useState } from "react";
 import { useAuth } from "../auth/AuthContext";
-import { apiFetch, ApiError } from "../api/client";
+import { apiFetch } from "../api/client";
 import FileInput from "../components/FileInput";
+import InlineEditable from "../components/InlineEditable";
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
-  const [pseudo, setPseudo] = useState(user?.pseudo ?? "");
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [avatarMessage, setAvatarMessage] = useState<string | null>(null);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const [avatarUploadKey, setAvatarUploadKey] = useState(0);
 
   if (!user) return null;
 
-  const handlePseudoSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setMessage(null);
-    try {
-      const response = await apiFetch("/api/users/me", {
-        method: "PATCH",
-        body: JSON.stringify({ pseudo }),
-      });
-      if (!response.ok) {
-        const body = await response.json();
-        throw new ApiError(response.status, body);
-      }
-      await refreshUser();
-      setMessage("Pseudo mis à jour.");
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 409) {
-        setError("Ce pseudo est déjà pris.");
-      } else {
-        setError("Une erreur est survenue.");
-      }
+  const handleSavePseudo = async (value: string) => {
+    const response = await apiFetch("/api/users/me", {
+      method: "PATCH",
+      body: JSON.stringify({ pseudo: value }),
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => null);
+      throw new Error(body?.message ?? "Échec de la mise à jour du pseudo.");
     }
+    await refreshUser();
   };
 
   const handleAvatarChange = async (file: File | null) => {
     if (!file) return;
-    setError(null);
-    setMessage(null);
+    setAvatarError(null);
+    setAvatarMessage(null);
     const formData = new FormData();
     formData.append("file", file);
     try {
       const response = await apiFetch("/api/users/me/avatar", { method: "POST", body: formData });
       if (!response.ok) {
-        throw new ApiError(response.status, await response.json().catch(() => null));
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.message ?? "Échec de l'upload de l'avatar.");
       }
       await refreshUser();
       setAvatarFailed(false);
-      setMessage("Avatar mis à jour.");
-    } catch {
-      setError("Échec de l'upload de l'avatar.");
+      setAvatarMessage("Avatar mis à jour.");
+    } catch (err) {
+      setAvatarError(err instanceof Error ? err.message : "Échec de l'upload de l'avatar.");
     } finally {
       setAvatarUploadKey((k) => k + 1);
     }
@@ -79,24 +67,21 @@ export default function ProfilePage() {
           </div>
         )}
         <div>
-          <p className="list-item-title" style={{ margin: 0 }}>{user.pseudo}</p>
+          <InlineEditable
+            as="p"
+            className="list-item-title"
+            value={user.pseudo}
+            onSave={handleSavePseudo}
+            canEdit
+            ariaLabel="le pseudo"
+            emptyText=""
+            required
+            minLength={3}
+            maxLength={32}
+          />
           <p className="muted" style={{ margin: 0 }}>{user.email}</p>
           <span className="badge badge-accent">{user.role}</span>
         </div>
-      </div>
-
-      <div className="card-section">
-        <h2>Modifier le pseudo</h2>
-        <form onSubmit={handlePseudoSubmit}>
-          <label className="field">
-            Pseudo
-            <input type="text" value={pseudo} onChange={(e) => setPseudo(e.target.value)} minLength={3} maxLength={32} required />
-          </label>
-          <button type="submit" className="btn-primary">
-            <Save size={16} />
-            Enregistrer
-          </button>
-        </form>
       </div>
 
       <div className="card-section">
@@ -108,10 +93,9 @@ export default function ProfilePage() {
           file={null}
           onChange={handleAvatarChange}
         />
+        {avatarMessage && <p className="alert alert-success" role="status">{avatarMessage}</p>}
+        {avatarError && <p className="alert alert-error" role="alert">{avatarError}</p>}
       </div>
-
-      {message && <p className="alert alert-success" role="status">{message}</p>}
-      {error && <p className="alert alert-error" role="alert">{error}</p>}
     </div>
   );
 }

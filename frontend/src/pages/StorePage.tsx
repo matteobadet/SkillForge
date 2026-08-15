@@ -64,6 +64,7 @@ export default function StorePage() {
                 <span className="entity-card-meta">
                   équipe {r.teamName} · par {r.publisherPseudo}
                 </span>
+                {r.description && <p className="entity-card-snippet">{r.description}</p>}
                 <div className="entity-card-footer">
                   <span className="badge">
                     <ArrowBigUp size={12} />

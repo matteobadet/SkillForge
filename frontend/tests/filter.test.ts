@@ -61,6 +61,15 @@ describe("filterResources", () => {
     expect(result.map((r) => r.id).sort()).toEqual(["1", "3"]);
   });
 
+  it("filters by description", () => {
+    const withDescription = [
+      makeResource({ id: "1", name: "Analyseur JSON", description: "Parse et valide du JSON" }),
+      makeResource({ id: "2", name: "Serveur MCP Fichiers", description: null }),
+    ];
+    const result = filterResources(withDescription, { query: "valide", type: "" });
+    expect(result.map((r) => r.id)).toEqual(["1"]);
+  });
+
   it("filters by type alone", () => {
     const result = filterResources(resources, { query: "", type: "MCP" });
     expect(result.map((r) => r.id)).toEqual(["2"]);
@@ -89,6 +98,15 @@ describe("filterTeams", () => {
   it("filters by name, case-insensitive", () => {
     const result = filterTeams(teams, { query: "SECRET" });
     expect(result.map((t) => t.id)).toEqual(["2"]);
+  });
+
+  it("filters by description", () => {
+    const withDescription = [
+      makeTeam({ id: "1", name: "Les Copains Devs", description: "Backend et infra" }),
+      makeTeam({ id: "2", name: "Secret Team", description: null }),
+    ];
+    const result = filterTeams(withDescription, { query: "infra" });
+    expect(result.map((t) => t.id)).toEqual(["1"]);
   });
 
   it("returns empty array when nothing matches", () => {
