@@ -32,6 +32,7 @@ var minioOptions = new MinioOptions
     ResourcesBucket = builder.Configuration["MINIO_BUCKET_RESOURCES"] ?? "resources",
     IconsBucket = builder.Configuration["MINIO_BUCKET_ICONS"] ?? "icons",
     UseSsl = false,
+    PublicUseSsl = bool.TryParse(builder.Configuration["MINIO_PUBLIC_USE_SSL"], out var publicUseSsl) && publicUseSsl,
 };
 builder.Services.Configure<MinioOptions>(o =>
 {
@@ -43,6 +44,7 @@ builder.Services.Configure<MinioOptions>(o =>
     o.ResourcesBucket = minioOptions.ResourcesBucket;
     o.IconsBucket = minioOptions.IconsBucket;
     o.UseSsl = minioOptions.UseSsl;
+    o.PublicUseSsl = minioOptions.PublicUseSsl;
 });
 
 var connectionString =
@@ -65,7 +67,7 @@ builder.Services.AddKeyedSingleton<IMinioClient>("internal", (_, _) => new Minio
 builder.Services.AddKeyedSingleton<IMinioClient>("public", (_, _) => new MinioClient()
     .WithEndpoint(minioOptions.PublicEndpoint)
     .WithCredentials(minioOptions.AccessKey, minioOptions.SecretKey)
-    .WithSSL(minioOptions.UseSsl)
+    .WithSSL(minioOptions.PublicUseSsl)
     .Build());
 
 builder.Services.AddScoped<AuthService>();

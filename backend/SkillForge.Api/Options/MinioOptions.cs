@@ -13,4 +13,6 @@ public class MinioOptions
     public required string ResourcesBucket { get; set; }
     public required string IconsBucket { get; set; }
     public bool UseSsl { get; set; } = false;
+    /// <summary>Whether presigned URLs are signed for https (needed when the public endpoint sits behind a TLS-terminating reverse proxy, e.g. in production).</summary>
+    public bool PublicUseSsl { get; set; } = false;
 }

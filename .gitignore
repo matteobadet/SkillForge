@@ -18,6 +18,11 @@ npm-debug.log*
 # Docker
 docker-compose.override.yml
 
+# Kubernetes secrets (never commit real values — only *.example.yaml)
+k8s/**/*.secret.yaml
+kubeconfig*
+*.kubeconfig
+
 # OS / editor
 .DS_Store
 Thumbs.db

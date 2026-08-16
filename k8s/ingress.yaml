@@ -1,0 +1,50 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: skillforge
+  namespace: skillforge
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - skillforge.mbadet.fr
+      secretName: skillforge-tls
+    - hosts:
+        - api.skillforge.mbadet.fr
+      secretName: api-skillforge-tls
+    - hosts:
+        - storage.skillforge.mbadet.fr
+      secretName: storage-skillforge-tls
+  rules:
+    - host: skillforge.mbadet.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+    - host: api.skillforge.mbadet.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
+    - host: storage.skillforge.mbadet.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio
+                port:
+                  number: 9000

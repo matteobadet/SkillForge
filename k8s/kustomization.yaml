@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: skillforge
+
+resources:
+  - namespace.yaml
+  - postgres/pvc.yaml
+  - postgres/deployment.yaml
+  - postgres/service.yaml
+  - minio/pvc.yaml
+  - minio/deployment.yaml
+  - minio/service.yaml
+  - api/deployment.yaml
+  - api/service.yaml
+  - frontend/deployment.yaml
+  - frontend/service.yaml
+  - ingress.yaml
+  - cert-manager/cluster-issuer.yaml
+
+# Le workflow CI/CD (.github/workflows/deploy.yml) écrase ces tags via
+# `kubectl set image` pour chaque déploiement — les valeurs ici ne servent
+# qu'au premier `kubectl apply -k k8s/` (bootstrap manuel, cf. quickstart.md).
+images:
+  - name: ghcr.io/matteobadet/skillforge-api
+    newTag: sha-c33b581
+  - name: ghcr.io/matteobadet/skillforge-frontend
+    newTag: sha-c33b581

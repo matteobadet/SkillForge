@@ -45,6 +45,18 @@ UPDATE users SET "Role" = 'Admin' WHERE "Email" = 'vous@example.com';
 d'où les guillemets doubles, obligatoires pour PostgreSQL avec une casse
 mixte.)
 
+## Déploiement production
+
+SkillForge tourne en production sur un VPS unique via Kubernetes (k3s) :
+frontend sur [skillforge.mbadet.fr](https://skillforge.mbadet.fr), API sur
+`api.skillforge.mbadet.fr`. Manifests, décisions techniques et guide de
+déploiement dans
+[specs/009-deploiement-k8s](specs/009-deploiement-k8s/spec.md) ; les
+manifests eux-mêmes sont dans [`k8s/`](k8s/). Chaque push sur `main`
+modifiant `backend/` ou `frontend/` déclenche automatiquement un nouveau
+déploiement via GitHub Actions
+([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)).
+
 ## Tests
 
 ```bash
@@ -79,6 +91,7 @@ docker-compose.yml
 | 006 | Passe de style UI (post-MVP) | ✅ Implémentée |
 | 007 | Icônes équipes/ressources + cards (post-MVP) | ✅ Implémentée |
 | 008 | Recherche/filtres + corrections de champs (post-MVP) | ✅ Implémentée |
+| 009 | Déploiement production sur VPS via Kubernetes (post-MVP) | ✅ Implémentée |
 
 Voir [.specify/memory/constitution.md](.specify/memory/constitution.md) pour
 les principes directeurs du projet.
