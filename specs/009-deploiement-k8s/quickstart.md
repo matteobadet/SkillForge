@@ -76,6 +76,15 @@ kubectl -n skillforge get pods
 # et la ressource de test créée à l'étape 5 est toujours visible dans l'app.
 ```
 
+**Résultat observé (validation réelle du 2026-08-16)** : SSH de nouveau
+joignable ~9s après le reboot ; les 4 pods (postgres, minio, api, frontend)
+reviennent tous `1/1 Running` ~26s après (même noms de pod, pas de
+recréation — k3s redémarre via son service systemd et rattache les PVC
+existants) ; total <1 min entre `sudo reboot` et un cluster pleinement
+fonctionnel, très en-deçà de la cible SC-002 (< 5 min). Aucune donnée
+perdue (ressource de test, compte, équipe tous intacts). Aucune limite
+particulière constatée avec `local-path` sur ce VPS.
+
 ## 7. Valider le pipeline CI/CD (US2)
 
 Pousser un commit trivial sur `main`, observer le workflow dans l'onglet

@@ -80,7 +80,7 @@ Infrastructure ajoutée à l'application web existante : `k8s/` (manifests), `fr
 - [X] T020 [US2] Créer `.github/workflows/deploy.yml` : build + push des deux images taguées `sha-<commit>` et `latest` sur `ghcr.io`, déclenché sur push `main` modifiant `backend/` ou `frontend/` (cf. contracts/deployment-interface.md)
 - [X] T021 [US2] Ajouter l'étape de déploiement SSH dans `deploy.yml` (`kubectl set image` + `kubectl rollout status --timeout=120s`, le job échoue si le rollout échoue, sans jamais couper le pod précédent qui fonctionne) (dépend de T020)
 - [X] T022 [US2] Configurer les secrets GitHub Actions requis (`VPS_SSH_PRIVATE_KEY`, PAT GHCR si nécessaire) dans les settings du repo — action manuelle utilisateur, référencée en commentaire dans `deploy.yml` (dépend de T020)
-- [ ] T023 [US2] Valider : pousser un commit trivial sur `main`, observer le workflow dans l'onglet Actions, vérifier le nouveau tag d'image déployé — quickstart.md étape 7 (dépend de T021, T022, et US1 complète)
+- [X] T023 [US2] Valider : pousser un commit trivial sur `main`, observer le workflow dans l'onglet Actions, vérifier le nouveau tag d'image déployé — quickstart.md étape 7 (dépend de T021, T022, et US1 complète)
 
 **Checkpoint**: US2 testable indépendamment (suppose US1 déjà déployée, puisque le workflow met à jour un déploiement existant).
 
@@ -94,9 +94,9 @@ Infrastructure ajoutée à l'application web existante : `k8s/` (manifests), `fr
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Revoir/ajuster les `resources.requests`/`limits` mémoire des 4 Deployments (`k8s/postgres/deployment.yaml`, `k8s/minio/deployment.yaml`, `k8s/api/deployment.yaml`, `k8s/frontend/deployment.yaml`) selon `kubectl top pods` réel, en gardant le total sous l'enveloppe du research.md #9 (dépend de T017, US1 complète)
-- [ ] T025 [US3] Exécuter le test de redémarrage complet du VPS et vérifier le retour de tous les pods + intégrité des données de T018 — quickstart.md étape 6 (dépend de T024)
-- [ ] T026 [US3] Documenter dans `quickstart.md` le temps de retour observé et toute limite constatée (ex. réattachement `local-path`) (dépend de T025)
+- [X] T024 [US3] Revoir/ajuster les `resources.requests`/`limits` mémoire des 4 Deployments (`k8s/postgres/deployment.yaml`, `k8s/minio/deployment.yaml`, `k8s/api/deployment.yaml`, `k8s/frontend/deployment.yaml`) selon `kubectl top pods` réel, en gardant le total sous l'enveloppe du research.md #9 (dépend de T017, US1 complète)
+- [X] T025 [US3] Exécuter le test de redémarrage complet du VPS et vérifier le retour de tous les pods + intégrité des données de T018 — quickstart.md étape 6 (dépend de T024)
+- [X] T026 [US3] Documenter dans `quickstart.md` le temps de retour observé et toute limite constatée (ex. réattachement `local-path`) (dépend de T025)
 
 **Checkpoint**: Les trois user stories sont fonctionnelles indépendamment.
 
