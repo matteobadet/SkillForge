@@ -11,6 +11,7 @@ import {
   uploadResourceIcon,
   type ResourceDetail,
 } from "../api/resources";
+import ConfirmDialog from "../components/ConfirmDialog";
 import EntityIcon from "../components/EntityIcon";
 import FileInput from "../components/FileInput";
 import IconPicker, { type IconPickerValue } from "../components/IconPicker";
@@ -37,6 +38,7 @@ export default function ResourcePage() {
   const [newArchive, setNewArchive] = useState<File | null>(null);
   const [versionNote, setVersionNote] = useState("");
   const [replacingArchive, setReplacingArchive] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const load = async () => {
     if (!id) return;
@@ -115,7 +117,7 @@ export default function ResourcePage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Supprimer définitivement "${resource.name}" ?`)) return;
+    setDeleteConfirmOpen(false);
     await deleteResource(resource.id);
     navigate(`/teams/${resource.teamId}`);
   };
@@ -200,13 +202,22 @@ export default function ResourcePage() {
           )}
           {error && <p className="alert alert-error" role="alert">{error}</p>}
           {resource.canDelete && (
-            <button type="button" className="btn-danger" onClick={handleDelete} style={{ marginTop: "var(--space-3)" }}>
+            <button type="button" className="btn-danger" onClick={() => setDeleteConfirmOpen(true)} style={{ marginTop: "var(--space-3)" }}>
               {resource.canManage ? <Trash2 size={16} /> : <ShieldAlert size={16} />}
               {resource.canManage ? "Supprimer" : "Supprimer (modération admin)"}
             </button>
           )}
         </section>
       )}
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        title="Supprimer la ressource"
+        message={`Supprimer définitivement "${resource.name}" ? Cette action est irréversible et supprime aussi tout son historique de versions.`}
+        confirmLabel="Supprimer"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirmOpen(false)}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowBigUp, Copy, LogOut, Plus, RefreshCw, Trash2, UserMinus, Lock, Globe } from "lucide-react";
+import { ArrowBigUp, Copy, Info, LogOut, Plus, RefreshCw, Trash2, UserMinus, Lock, Globe } from "lucide-react";
 import { ApiError } from "../api/client";
 import {
   deleteTeam,
@@ -15,6 +15,7 @@ import {
 } from "../api/teams";
 import { listTeamResources, type ResourceSummary } from "../api/resources";
 import { useAuth } from "../auth/AuthContext";
+import ConfirmDialog from "../components/ConfirmDialog";
 import EntityIcon from "../components/EntityIcon";
 import IconPicker, { type IconPickerValue } from "../components/IconPicker";
 import InlineEditable from "../components/InlineEditable";
@@ -38,6 +39,7 @@ export default function TeamPage() {
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [failedAvatars, setFailedAvatars] = useState<Set<string>>(new Set());
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const isOwner = team?.myRole === "Owner";
   const isMember = team?.myRole !== null && team?.myRole !== undefined;
@@ -104,7 +106,7 @@ export default function TeamPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Supprimer définitivement l'équipe "${team.name}" ?`)) return;
+    setDeleteConfirmOpen(false);
     await deleteTeam(team.id);
     navigate("/teams");
   };
@@ -149,6 +151,13 @@ export default function TeamPage() {
         multiline
         maxLength={500}
       />
+
+      {user && !isMember && (
+        <p className="alert" style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", margin: "var(--space-3) 0" }}>
+          <Info size={16} style={{ flexShrink: 0 }} />
+          Cette équipe est publique : vous voyez son contenu sans en être membre. La rejoindre nécessite un lien d'invitation partagé par un de ses membres.
+        </p>
+      )}
 
       <h2>Membres ({team.members.length})</h2>
       <ul className="list">
@@ -248,14 +257,21 @@ export default function TeamPage() {
 
           {error && <p className="alert alert-error" role="alert">{error}</p>}
 
-          <button type="button" className="btn-danger" onClick={handleDelete} style={{ marginTop: "var(--space-3)" }}>
+          <button type="button" className="btn-danger" onClick={() => setDeleteConfirmOpen(true)} style={{ marginTop: "var(--space-3)" }}>
             <Trash2 size={16} />
             Supprimer l'équipe
           </button>
         </section>
       )}
 
-      {user && !isMember && <p className="alert" style={{ marginTop: "var(--space-4)" }}>Vous n'êtes pas membre de cette équipe.</p>}
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        title="Supprimer l'équipe"
+        message={`Supprimer définitivement l'équipe "${team.name}" ? Cette action est irréversible et supprime aussi toutes ses ressources.`}
+        confirmLabel="Supprimer"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirmOpen(false)}
+      />
     </div>
   );
 }
