@@ -102,6 +102,35 @@ public class ResourcePreviewServiceTests
     }
 
     [Fact]
+    public async Task ExtractPreviewAsync_StripsYamlFrontmatter()
+    {
+        using var zip = BuildZip(("SKILL.md", "---\nname: mon-skill\ndescription: un skill de test\n---\nContenu factice du skill."));
+        var result = await new ResourcePreviewService().ExtractPreviewAsync(zip);
+
+        Assert.True(result.Available);
+        Assert.Equal("Contenu factice du skill.", result.Content);
+    }
+
+    [Fact]
+    public async Task ExtractPreviewAsync_LeavesContentAlone_WhenFrontmatterHasNoClosingDelimiter()
+    {
+        using var zip = BuildZip(("SKILL.md", "---\nname: mon-skill\nno closing delimiter here"));
+        var result = await new ResourcePreviewService().ExtractPreviewAsync(zip);
+
+        Assert.True(result.Available);
+        Assert.Equal("---\nname: mon-skill\nno closing delimiter here", result.Content);
+    }
+
+    [Fact]
+    public async Task ExtractPreviewAsync_LeavesContentAlone_WhenNoFrontmatter()
+    {
+        using var zip = BuildZip(("SKILL.md", "# Mon Skill\n\nPas de frontmatter ici."));
+        var result = await new ResourcePreviewService().ExtractPreviewAsync(zip);
+
+        Assert.Equal("# Mon Skill\n\nPas de frontmatter ici.", result.Content);
+    }
+
+    [Fact]
     public async Task ExtractPreviewAsync_CorruptedArchive_ReturnsUnavailable()
     {
         using var notAZip = new MemoryStream(Encoding.UTF8.GetBytes("this is not a zip file"));
