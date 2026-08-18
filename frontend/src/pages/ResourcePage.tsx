@@ -14,6 +14,7 @@ import {
 import EntityIcon from "../components/EntityIcon";
 import IconPicker, { type IconPickerValue } from "../components/IconPicker";
 import InlineEditable from "../components/InlineEditable";
+import ResourcePreview from "../components/ResourcePreview";
 import { defaultResourceIcon } from "../icons/presets";
 
 function messageOf(err: unknown, fallback: string): string {
@@ -136,6 +137,8 @@ export default function ResourcePage() {
           {resource.upvotedByMe ? "Retirer mon upvote" : "Upvote"} ({resource.upvoteCount})
         </button>
       </div>
+
+      <ResourcePreview resourceId={resource.id} />
 
       {(resource.canManage || resource.canDelete) && (
         <section className="card-section">

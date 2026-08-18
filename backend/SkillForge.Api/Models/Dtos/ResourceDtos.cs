@@ -36,3 +36,5 @@ public record ResourceDetailDto(
 public record UpvoteResponse(int UpvoteCount, bool UpvotedByMe);
 
 public record DownloadUrlResponse(string DownloadUrl);
+
+public record ResourcePreviewDto(bool Available, string? FileName, string? Content, bool Truncated);

@@ -74,6 +74,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ObjectStorageService>();
 builder.Services.AddScoped<TeamService>();
 builder.Services.AddScoped<ResourceService>();
+builder.Services.AddScoped<ResourcePreviewService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

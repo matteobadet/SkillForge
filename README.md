@@ -92,6 +92,7 @@ docker-compose.yml
 | 007 | Icônes équipes/ressources + cards (post-MVP) | ✅ Implémentée |
 | 008 | Recherche/filtres + corrections de champs (post-MVP) | ✅ Implémentée |
 | 009 | Déploiement production sur VPS via Kubernetes (post-MVP) | ✅ Implémentée |
+| 010 | Aperçu du contenu d'une ressource (post-MVP) | ✅ Implémentée |
 
 Voir [.specify/memory/constitution.md](.specify/memory/constitution.md) pour
 les principes directeurs du projet.

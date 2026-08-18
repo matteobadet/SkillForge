@@ -706,3 +706,51 @@ button:disabled {
   margin-top: var(--space-1);
   flex-wrap: wrap;
 }
+
+/* ---- Resource preview (Markdown) ---- */
+
+.resource-preview {
+  margin: var(--space-3) 0;
+  max-width: 720px;
+}
+
+.resource-preview-content h1,
+.resource-preview-content h2,
+.resource-preview-content h3 {
+  margin-top: var(--space-4);
+}
+
+.resource-preview-content > :first-child {
+  margin-top: 0;
+}
+
+.resource-preview-content p,
+.resource-preview-content ul,
+.resource-preview-content ol {
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.resource-preview-content ul,
+.resource-preview-content ol {
+  padding-left: var(--space-5);
+}
+
+.resource-preview-content pre {
+  overflow-x: auto;
+  background: var(--code-bg);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  margin: var(--space-2) 0;
+}
+
+.resource-preview-content pre code {
+  display: block;
+  background: none;
+  padding: 0;
+}
+
+.resource-preview-truncated {
+  margin-top: var(--space-3);
+  font-style: italic;
+}

@@ -18,6 +18,7 @@ public class ResourcesController(
     ResourceService resourceService,
     TeamService teamService,
     ObjectStorageService objectStorage,
+    ResourcePreviewService resourcePreviewService,
     IOptions<MinioOptions> minioOptions) : ControllerBase
 {
     private static readonly HashSet<string> AllowedContentTypes = new() { "application/zip", "application/x-zip-compressed", "application/x-zip" };
@@ -148,6 +149,18 @@ public class ResourcesController(
 
         var url = await objectStorage.GetPresignedUrlAsync(ResourcesBucket, resource.ObjectKey);
         return Ok(new DownloadUrlResponse(url));
+    }
+
+    [HttpGet("api/resources/{id:guid}/preview")]
+    public async Task<ActionResult<ResourcePreviewDto>> Preview(Guid id)
+    {
+        var userId = User.GetUserId();
+        var resource = await resourceService.GetVisibleResourceAsync(id, userId, IsAdmin);
+        if (resource is null) return NotFound();
+
+        await using var archive = await objectStorage.DownloadToMemoryAsync(ResourcesBucket, resource.ObjectKey);
+        var preview = await resourcePreviewService.ExtractPreviewAsync(archive);
+        return Ok(preview);
     }
 
     [HttpPatch("api/resources/{id:guid}")]

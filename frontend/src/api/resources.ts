@@ -49,6 +49,17 @@ export function getDownloadUrl(id: string) {
   return apiJson<{ downloadUrl: string }>(`/api/resources/${id}/download`);
 }
 
+export interface ResourcePreview {
+  available: boolean;
+  fileName: string | null;
+  content: string | null;
+  truncated: boolean;
+}
+
+export function getResourcePreview(id: string) {
+  return apiJson<ResourcePreview>(`/api/resources/${id}/preview`);
+}
+
 export function updateResource(id: string, patch: { name?: string; description?: string; iconPreset?: string; file?: File }) {
   const formData = new FormData();
   if (patch.name !== undefined) formData.append("name", patch.name);

@@ -30,6 +30,17 @@ public class ObjectStorageService(
         return objectKey;
     }
 
+    public async Task<MemoryStream> DownloadToMemoryAsync(string bucket, string objectKey, CancellationToken ct = default)
+    {
+        var memoryStream = new MemoryStream();
+        await minio.GetObjectAsync(new GetObjectArgs()
+            .WithBucket(bucket)
+            .WithObject(objectKey)
+            .WithCallbackStream(async (stream, innerCt) => await stream.CopyToAsync(memoryStream, innerCt)), ct);
+        memoryStream.Position = 0;
+        return memoryStream;
+    }
+
     public async Task<string> GetPresignedUrlAsync(string bucket, string objectKey, CancellationToken ct = default)
     {
         return await publicMinio.PresignedGetObjectAsync(new PresignedGetObjectArgs()
