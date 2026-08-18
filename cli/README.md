@@ -37,11 +37,16 @@ Télécharge et décompresse toutes les ressources visibles de l'équipe dans
 `<dir>/skills|mcp|agents/<nom-ressource>/` (`~/.claude` par défaut, remplace
 tout dossier local existant du même nom).
 
-### `skillforge push <teamId> <chemin> --name <nom> [--type <Skill|MCP|Agent>] [--description <texte>]`
+### `skillforge push <teamId> <chemin> --name <nom> [--type <Skill|MCP|Agent>] [--description <texte>] [--note <texte>]`
 
 Compresse `<chemin>` (fichier ou dossier) et publie une nouvelle ressource,
 ou met à jour celle existante du même nom dans l'équipe. `--type` est requis
-uniquement pour une nouvelle ressource.
+uniquement pour une nouvelle ressource. Chaque remplacement d'archive
+devient une nouvelle version consultable/téléchargeable individuellement
+sur la page de la ressource — l'historique n'est jamais écrasé. `--note`
+(300 caractères max) décrit ce qui a changé dans cette version ; ignoré
+lors d'une première publication (il n'y a rien à décrire par rapport à une
+version antérieure).
 
 ### Options globales
 

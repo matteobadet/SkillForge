@@ -25,6 +25,7 @@ public class ResourcesController(
     private static readonly HashSet<string> AllowedIconContentTypes = new() { "image/jpeg", "image/png", "image/webp" };
     private const long MaxArchiveSizeBytes = 50 * 1024 * 1024;
     private const long MaxIconSizeBytes = 2 * 1024 * 1024;
+    private const int MaxNoteLength = 300;
     private string ResourcesBucket => minioOptions.Value.ResourcesBucket;
     private string IconsBucket => minioOptions.Value.IconsBucket;
     private bool IsAdmin => User.IsInRole(UserRole.Admin.ToString());
@@ -91,6 +92,7 @@ public class ResourcesController(
         }
 
         var resource = await resourceService.CreateResourceAsync(teamId, userId, name, description, type, objectKey);
+        await resourceService.CreateInitialVersionAsync(resource, userId);
         if (iconPreset is not null)
         {
             await resourceService.SetIconPresetAsync(resource, iconPreset);
@@ -163,8 +165,32 @@ public class ResourcesController(
         return Ok(preview);
     }
 
+    [HttpGet("api/resources/{id:guid}/versions")]
+    public async Task<ActionResult<List<ResourceVersionDto>>> ListVersions(Guid id)
+    {
+        var userId = User.GetUserId();
+        var resource = await resourceService.GetVisibleResourceAsync(id, userId, IsAdmin);
+        if (resource is null) return NotFound();
+
+        return Ok(await resourceService.ListVersionsAsync(resource));
+    }
+
+    [HttpGet("api/resources/{id:guid}/versions/{versionNumber:int}/download")]
+    public async Task<ActionResult<DownloadUrlResponse>> DownloadVersion(Guid id, int versionNumber)
+    {
+        var userId = User.GetUserId();
+        var resource = await resourceService.GetVisibleResourceAsync(id, userId, IsAdmin);
+        if (resource is null) return NotFound();
+
+        var objectKey = await resourceService.GetVersionObjectKeyAsync(resource, versionNumber);
+        if (objectKey is null) return NotFound();
+
+        var url = await objectStorage.GetPresignedUrlAsync(ResourcesBucket, objectKey);
+        return Ok(new DownloadUrlResponse(url));
+    }
+
     [HttpPatch("api/resources/{id:guid}")]
-    public async Task<ActionResult<ResourceDetailDto>> Update(Guid id, [FromForm] string? name, [FromForm] string? description, [FromForm] string? iconPreset, IFormFile? file)
+    public async Task<ActionResult<ResourceDetailDto>> Update(Guid id, [FromForm] string? name, [FromForm] string? description, [FromForm] string? iconPreset, [FromForm] string? note, IFormFile? file)
     {
         var userId = User.GetUserId();
         var resource = await resourceService.GetVisibleResourceAsync(id, userId, IsAdmin);
@@ -200,12 +226,14 @@ public class ResourcesController(
             {
                 return BadRequest(new { error = "invalid_file", message = "Archive .zip requise (50 Mo max)." });
             }
-            var previousKey = resource.ObjectKey;
-            await using var stream = file.OpenReadStream();
+            if (note is not null && note.Length > MaxNoteLength)
+            {
+                return BadRequest(new { error = "invalid_note", message = "La note de version est limitée à 300 caractères." });
+            }
             var newKey = $"{resource.TeamId}/{Guid.NewGuid()}.zip";
+            await using var stream = file.OpenReadStream();
             await objectStorage.UploadAsync(ResourcesBucket, newKey, stream, file.Length, file.ContentType);
-            resource.ObjectKey = newKey;
-            await objectStorage.DeleteAsync(ResourcesBucket, previousKey);
+            await resourceService.RecordNewVersionAsync(resource, newKey, note, userId);
         }
 
         resource.UpdatedAt = DateTimeOffset.UtcNow;
@@ -255,8 +283,11 @@ public class ResourcesController(
         if (resource is null) return NotFound();
         if (!await resourceService.CanManageAsync(resource, userId) && !IsAdmin) return Forbid();
 
-        await resourceService.DeleteResourceAsync(id);
-        await objectStorage.DeleteAsync(ResourcesBucket, resource.ObjectKey);
+        var objectKeys = await resourceService.DeleteResourceAsync(id);
+        foreach (var objectKey in objectKeys)
+        {
+            await objectStorage.DeleteAsync(ResourcesBucket, objectKey);
+        }
         return NoContent();
     }
 

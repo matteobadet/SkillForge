@@ -60,13 +60,30 @@ export function getResourcePreview(id: string) {
   return apiJson<ResourcePreview>(`/api/resources/${id}/preview`);
 }
 
-export function updateResource(id: string, patch: { name?: string; description?: string; iconPreset?: string; file?: File }) {
+export function updateResource(id: string, patch: { name?: string; description?: string; iconPreset?: string; file?: File; note?: string }) {
   const formData = new FormData();
   if (patch.name !== undefined) formData.append("name", patch.name);
   if (patch.description !== undefined) formData.append("description", patch.description);
   if (patch.iconPreset !== undefined) formData.append("iconPreset", patch.iconPreset);
   if (patch.file) formData.append("file", patch.file);
+  if (patch.note !== undefined) formData.append("note", patch.note);
   return apiJson<ResourceDetail>(`/api/resources/${id}`, { method: "PATCH", body: formData });
+}
+
+export interface ResourceVersion {
+  versionNumber: number;
+  note: string | null;
+  createdAt: string;
+  publisherPseudo: string;
+  isCurrent: boolean;
+}
+
+export function listResourceVersions(id: string) {
+  return apiJson<ResourceVersion[]>(`/api/resources/${id}/versions`);
+}
+
+export function getVersionDownloadUrl(id: string, versionNumber: number) {
+  return apiJson<{ downloadUrl: string }>(`/api/resources/${id}/versions/${versionNumber}/download`);
 }
 
 export async function deleteResource(id: string) {

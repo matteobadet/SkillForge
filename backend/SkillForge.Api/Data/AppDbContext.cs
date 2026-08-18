@@ -12,6 +12,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<TeamInviteLink> TeamInviteLinks => Set<TeamInviteLink>();
     public DbSet<Resource> Resources => Set<Resource>();
     public DbSet<ResourceUpvote> ResourceUpvotes => Set<ResourceUpvote>();
+    public DbSet<ResourceVersion> ResourceVersions => Set<ResourceVersion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -90,6 +91,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasOne<User>()
                 .WithMany()
                 .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ResourceVersion>(entity =>
+        {
+            entity.ToTable("resource_versions");
+            entity.HasIndex(v => new { v.ResourceId, v.VersionNumber }).IsUnique();
+            entity.HasOne(v => v.Resource)
+                .WithMany(r => r.Versions)
+                .HasForeignKey(v => v.ResourceId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(v => v.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(v => v.CreatedByUserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

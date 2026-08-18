@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowBigUp, Download, ShieldAlert, Trash2 } from "lucide-react";
+import { ArrowBigUp, Download, ShieldAlert, Trash2, UploadCloud } from "lucide-react";
 import { ApiError } from "../api/client";
 import {
   deleteResource,
@@ -12,9 +12,11 @@ import {
   type ResourceDetail,
 } from "../api/resources";
 import EntityIcon from "../components/EntityIcon";
+import FileInput from "../components/FileInput";
 import IconPicker, { type IconPickerValue } from "../components/IconPicker";
 import InlineEditable from "../components/InlineEditable";
 import ResourcePreview from "../components/ResourcePreview";
+import ResourceVersionHistory from "../components/ResourceVersionHistory";
 import { defaultResourceIcon } from "../icons/presets";
 
 function messageOf(err: unknown, fallback: string): string {
@@ -31,6 +33,10 @@ export default function ResourcePage() {
   const [resource, setResource] = useState<ResourceDetail | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [versionsRefreshKey, setVersionsRefreshKey] = useState(0);
+  const [newArchive, setNewArchive] = useState<File | null>(null);
+  const [versionNote, setVersionNote] = useState("");
+  const [replacingArchive, setReplacingArchive] = useState(false);
 
   const load = async () => {
     if (!id) return;
@@ -90,6 +96,24 @@ export default function ResourcePage() {
     }
   };
 
+  const handleReplaceArchive = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!newArchive) return;
+    setError(null);
+    setReplacingArchive(true);
+    try {
+      const updated = await updateResource(resource.id, { file: newArchive, note: versionNote || undefined });
+      setResource(updated);
+      setNewArchive(null);
+      setVersionNote("");
+      setVersionsRefreshKey((k) => k + 1);
+    } catch (err) {
+      setError(messageOf(err, "Échec du remplacement de l'archive."));
+    } finally {
+      setReplacingArchive(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!confirm(`Supprimer définitivement "${resource.name}" ?`)) return;
     await deleteResource(resource.id);
@@ -140,6 +164,8 @@ export default function ResourcePage() {
 
       <ResourcePreview resourceId={resource.id} />
 
+      <ResourceVersionHistory key={versionsRefreshKey} resourceId={resource.id} />
+
       {(resource.canManage || resource.canDelete) && (
         <section className="card-section">
           <h2>Gestion</h2>
@@ -148,6 +174,29 @@ export default function ResourcePage() {
               <h3>Icône</h3>
               <IconPicker value={{ preset: resource.iconPreset, file: null }} onChange={handleIconChange} />
             </div>
+          )}
+          {resource.canManage && (
+            <form onSubmit={handleReplaceArchive} className="card" style={{ marginTop: "var(--space-3)" }}>
+              <h3>Remplacer l'archive</h3>
+              <div className="field">
+                <span>Nouvelle archive</span>
+                <FileInput accept=".zip" placeholder="Choisir une archive .zip (50 Mo max)" file={newArchive} onChange={setNewArchive} />
+              </div>
+              <label className="field">
+                Note de version (optionnel)
+                <input
+                  type="text"
+                  value={versionNote}
+                  onChange={(e) => setVersionNote(e.target.value)}
+                  maxLength={300}
+                  placeholder="Ex : corrige un bug de parsing"
+                />
+              </label>
+              <button type="submit" className="btn-primary" disabled={!newArchive || replacingArchive}>
+                <UploadCloud size={16} />
+                Publier cette version
+              </button>
+            </form>
           )}
           {error && <p className="alert alert-error" role="alert">{error}</p>}
           {resource.canDelete && (

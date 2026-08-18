@@ -24,4 +24,5 @@ public class Resource
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public ICollection<ResourceUpvote> Upvotes { get; set; } = new List<ResourceUpvote>();
+    public ICollection<ResourceVersion> Versions { get; set; } = new List<ResourceVersion>();
 }

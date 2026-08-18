@@ -38,3 +38,5 @@ public record UpvoteResponse(int UpvoteCount, bool UpvotedByMe);
 public record DownloadUrlResponse(string DownloadUrl);
 
 public record ResourcePreviewDto(bool Available, string? FileName, string? Content, bool Truncated);
+
+public record ResourceVersionDto(int VersionNumber, string? Note, DateTimeOffset CreatedAt, string PublisherPseudo, bool IsCurrent);

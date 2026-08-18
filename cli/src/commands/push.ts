@@ -12,6 +12,7 @@ export interface PushOptions {
   name: string;
   type?: ResourceType;
   description?: string;
+  note?: string;
 }
 
 function buildArchive(localPath: string): Buffer {
@@ -46,6 +47,7 @@ export async function pushCommand(client: ApiClient, teamId: string, localPath: 
   }
 
   if (existing) {
+    if (options.note) form.append("note", options.note);
     const res = await client.request(`/api/resources/${existing.id}`, { method: "PATCH", body: form });
     if (!res.ok) throw new CliError(await describeError(res));
     console.log(`Ressource "${options.name}" mise à jour.`);

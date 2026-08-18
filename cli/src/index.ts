@@ -54,7 +54,8 @@ program
   .requiredOption("--name <nom>", "Nom de la ressource")
   .option("--type <type>", "Type (Skill|MCP|Agent) — requis pour une nouvelle ressource")
   .option("--description <texte>", "Description")
-  .action(async (teamId: string, chemin: string, opts: { name: string; type?: string; description?: string }) => {
+  .option("--note <texte>", "Note décrivant le changement (mise à jour d'une ressource existante uniquement, 300 caractères max)")
+  .action(async (teamId: string, chemin: string, opts: { name: string; type?: string; description?: string; note?: string }) => {
     const apiUrl = resolveApiUrl(program.opts().apiUrl);
     if (opts.type && !isResourceType(opts.type)) {
       throw new CliError("Type invalide : utilisez Skill, MCP ou Agent.");
@@ -63,6 +64,7 @@ program
       name: opts.name,
       type: opts.type as "Skill" | "MCP" | "Agent" | undefined,
       description: opts.description,
+      note: opts.note,
     });
   });
 
