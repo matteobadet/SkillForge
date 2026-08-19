@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
 using Minio.DataModel.Args;
+using SkillForge.Api.Models.Dtos;
 
 namespace SkillForge.Api.Services;
 
@@ -54,5 +55,25 @@ public class ObjectStorageService(
         await minio.RemoveObjectAsync(new RemoveObjectArgs()
             .WithBucket(bucket)
             .WithObject(objectKey), ct);
+    }
+
+    /// <summary>Sums object sizes/counts per bucket by listing live from MinIO — no size tracked in the database.</summary>
+    public async Task<StorageUsageDto> GetUsageAsync(IEnumerable<(string Bucket, string Label)> buckets, CancellationToken ct = default)
+    {
+        var bucketUsages = new List<BucketUsageDto>();
+        foreach (var (bucket, label) in buckets)
+        {
+            long bucketBytes = 0;
+            var objectCount = 0;
+            var args = new ListObjectsArgs().WithBucket(bucket).WithRecursive(true);
+            await foreach (var item in minio.ListObjectsEnumAsync(args, ct))
+            {
+                bucketBytes += (long)item.Size;
+                objectCount++;
+            }
+            bucketUsages.Add(new BucketUsageDto(bucket, label, objectCount, bucketBytes));
+        }
+
+        return new StorageUsageDto(bucketUsages.Sum(b => b.TotalBytes), DateTimeOffset.UtcNow, bucketUsages);
     }
 }

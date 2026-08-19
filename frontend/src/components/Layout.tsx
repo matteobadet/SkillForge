@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Boxes, Store, Users, User, LogOut } from "lucide-react";
+import { Boxes, Store, Users, User, LogOut, HardDrive } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 
 export default function Layout({ children }: { children: ReactNode }) {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -34,6 +34,12 @@ export default function Layout({ children }: { children: ReactNode }) {
             <User size={16} />
             Profil
           </NavLink>
+          {user?.role === "Admin" && (
+            <NavLink to="/admin/storage" className={linkClass}>
+              <HardDrive size={16} />
+              Stockage
+            </NavLink>
+          )}
         </div>
         <button type="button" className="app-nav-logout" onClick={handleLogout}>
           <LogOut size={16} />

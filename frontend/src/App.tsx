@@ -11,11 +11,20 @@ import JoinTeamPage from "./pages/JoinTeamPage";
 import StorePage from "./pages/StorePage";
 import PublishResourcePage from "./pages/PublishResourcePage";
 import ResourcePage from "./pages/ResourcePage";
+import AdminStoragePage from "./pages/AdminStoragePage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return <p>Chargement...</p>;
   if (!user) return <Navigate to="/login" replace />;
+  return <Layout>{children}</Layout>;
+}
+
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  if (loading) return <p>Chargement...</p>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== "Admin") return <Navigate to="/store" replace />;
   return <Layout>{children}</Layout>;
 }
 
@@ -87,6 +96,14 @@ export default function App() {
           <ProtectedRoute>
             <ResourcePage />
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/storage"
+        element={
+          <AdminRoute>
+            <AdminStoragePage />
+          </AdminRoute>
         }
       />
     </Routes>
