@@ -149,7 +149,7 @@ export default function ResourcePage() {
         multiline
         maxLength={500}
       />
-      <p className="list-item-meta">
+      <p className="resource-byline">
         Équipe : <Link to={`/teams/${resource.teamId}`}>{resource.teamName}</Link> · Publié par {resource.publisherPseudo}
       </p>
 

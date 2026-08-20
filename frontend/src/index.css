@@ -462,8 +462,17 @@ button:disabled {
   color: var(--text);
   font-size: 15px;
   line-height: 1.6;
-  margin: var(--space-3) 0 var(--space-4);
+  margin: var(--space-5) 0 var(--space-2);
   max-width: 640px;
+}
+
+/* Ligne "Équipe : X · Publié par Y" sous la description d'une ressource :
+   regroupée visuellement avec la description (peu d'espace au-dessus),
+   avec plus de respiration avant les boutons d'action qui suivent. */
+.resource-byline {
+  color: var(--text);
+  font-size: 14px;
+  margin: 0 0 var(--space-4);
 }
 
 /* ---- Inline editing ---- */
