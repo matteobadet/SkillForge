@@ -361,6 +361,29 @@ form button[type='submit']:hover {
   color: #fff;
 }
 
+/* Grossit une action déjà .btn-primary quand elle doit dominer visuellement
+   la page (ex. Télécharger sur une ressource) plutôt que d'être au même
+   niveau que les actions secondaires qui l'entourent. */
+.btn-lg {
+  padding: var(--space-3) var(--space-5);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Action secondaire volontairement discrète à côté d'une .btn-lg (ex.
+   Upvote à côté de Télécharger) — pas de bordure ni de fond au repos. */
+.btn-ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-subtle);
+  border-color: transparent;
+  color: var(--text-h);
+}
+
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -383,6 +406,24 @@ button:disabled {
   margin-top: var(--space-5);
   padding-top: var(--space-5);
   border-top: 1px solid var(--border);
+}
+
+/* Isole une action destructrice (ex. suppression) du reste d'une section
+   "Gestion" — ne doit jamais se fondre visuellement avec des cards neutres. */
+.danger-zone {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--danger-bg);
+  border-radius: var(--radius);
+}
+
+.danger-zone-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--danger);
+  margin: 0 0 var(--space-2);
 }
 
 .list {

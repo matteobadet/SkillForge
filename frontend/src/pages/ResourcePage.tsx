@@ -153,12 +153,12 @@ export default function ResourcePage() {
         Équipe : <Link to={`/teams/${resource.teamId}`}>{resource.teamName}</Link> · Publié par {resource.publisherPseudo}
       </p>
 
-      <div style={{ display: "flex", gap: "var(--space-2)" }}>
-        <button type="button" className="btn-primary" onClick={handleDownload}>
-          <Download size={16} />
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+        <button type="button" className="btn-primary btn-lg" onClick={handleDownload}>
+          <Download size={18} />
           Télécharger
         </button>
-        <button type="button" className="btn" onClick={handleUpvote}>
+        <button type="button" className="btn btn-ghost" onClick={handleUpvote}>
           <ArrowBigUp size={16} />
           {resource.upvotedByMe ? "Retirer mon upvote" : "Upvote"} ({resource.upvoteCount})
         </button>
@@ -202,10 +202,18 @@ export default function ResourcePage() {
           )}
           {error && <p className="alert alert-error" role="alert">{error}</p>}
           {resource.canDelete && (
-            <button type="button" className="btn-danger" onClick={() => setDeleteConfirmOpen(true)} style={{ marginTop: "var(--space-3)" }}>
-              {resource.canManage ? <Trash2 size={16} /> : <ShieldAlert size={16} />}
-              {resource.canManage ? "Supprimer" : "Supprimer (modération admin)"}
-            </button>
+            <div className="danger-zone">
+              <p className="danger-zone-label">Zone à risque</p>
+              <p className="muted" style={{ marginBottom: "var(--space-3)" }}>
+                {resource.canManage
+                  ? "Supprime définitivement cette ressource et tout son historique de versions."
+                  : "Suppression via modération admin — la ressource et son historique disparaissent définitivement."}
+              </p>
+              <button type="button" className="btn-danger" onClick={() => setDeleteConfirmOpen(true)}>
+                {resource.canManage ? <Trash2 size={16} /> : <ShieldAlert size={16} />}
+                {resource.canManage ? "Supprimer" : "Supprimer (modération admin)"}
+              </button>
+            </div>
           )}
         </section>
       )}
