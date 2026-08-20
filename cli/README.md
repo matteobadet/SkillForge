@@ -4,7 +4,18 @@ CLI de synchronisation manuelle pour [SkillForge](../README.md) : connecte
 un dossier Claude local (`~/.claude` par défaut) aux Skills/MCP/Agents
 publiés dans les équipes d'une instance SkillForge.
 
-## Installation (développement local)
+## Installation
+
+```bash
+npm install -g @matteobadet/skillforge-cli
+```
+
+La commande installée s'appelle `skillforge` (seul le nom du paquet npm est
+scopé, pas la commande).
+
+## Installation (développement local du CLI)
+
+Pour travailler sur le CLI lui-même plutôt que l'installer depuis npm :
 
 ```bash
 cd cli

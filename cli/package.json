@@ -1,8 +1,19 @@
 {
-  "name": "skillforge-cli",
+  "name": "@matteobadet/skillforge-cli",
   "version": "0.1.0",
   "description": "CLI de synchronisation pour SkillForge (login, pull, push de Skills/MCP/Agents)",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matteobadet/SkillForge.git",
+    "directory": "cli"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
   "bin": {
     "skillforge": "./dist/index.js"
   },

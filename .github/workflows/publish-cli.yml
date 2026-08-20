@@ -1,0 +1,52 @@
+name: Publish CLI
+
+# Publie @matteobadet/skillforge-cli sur npm à chaque push sur main qui modifie
+# cli/package.json — seulement si la version qu'il contient n'est pas déjà
+# publiée (bump la version dans package.json pour déclencher une publication).
+#
+# Secret requis (repo settings > Secrets and variables > Actions) :
+#   NPM_TOKEN — token d'automation npm (npmjs.com > Access Tokens > Generate
+#   New Token > Automation), avec droit de publication sur le scope
+#   @matteobadet.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "cli/package.json"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cli
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Check if this version is already published
+        id: check
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if npm view "@matteobadet/skillforge-cli@$PKG_VERSION" version 2>/dev/null; then
+            echo "already_published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "already_published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install and build
+        if: steps.check.outputs.already_published == 'false'
+        run: |
+          npm install
+          npm run build
+
+      - name: Publish to npm
+        if: steps.check.outputs.already_published == 'false'
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
