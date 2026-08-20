@@ -711,13 +711,31 @@ button:disabled {
 
 .resource-preview {
   margin: var(--space-3) 0;
-  max-width: 720px;
+  max-width: 640px;
 }
 
-.resource-preview-content h1,
-.resource-preview-content h2,
-.resource-preview-content h3 {
+/* Le nom de la ressource est déjà le h1 de la page (ResourcePage) — le
+   contenu Markdown ne doit jamais rivaliser avec lui en taille. Les niveaux
+   sont donc rétrogradés d'un cran visuellement (h1 ~ h2 du reste du site,
+   h3 devient un petit label plutôt qu'un vrai titre). */
+.resource-preview-content h1 {
+  font-size: 19px;
+  letter-spacing: -0.2px;
+  margin-top: var(--space-5);
+}
+
+.resource-preview-content h2 {
+  font-size: 16px;
   margin-top: var(--space-4);
+}
+
+.resource-preview-content h3 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  margin-top: var(--space-3);
 }
 
 .resource-preview-content > :first-child {
