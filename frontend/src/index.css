@@ -768,6 +768,28 @@ button:disabled {
   padding: 0;
 }
 
+.resource-preview-content.resource-preview-collapsed {
+  max-height: 420px;
+  overflow: hidden;
+  position: relative;
+}
+
+.resource-preview-content.resource-preview-collapsed::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 84px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+
+.resource-preview-toggle {
+  width: 100%;
+  margin-top: var(--space-3);
+}
+
 .resource-preview-truncated {
   margin-top: var(--space-3);
   font-style: italic;
