@@ -2,7 +2,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { readCredentials } from "./credentials.js";
 
-const DEFAULT_API_URL = "http://localhost:5080";
+const DEFAULT_API_URL = "https://api.skillforge.mbadet.fr";
 
 export function resolveApiUrl(flagValue?: string, credentialsBaseDir?: string): string {
   if (flagValue) return flagValue;

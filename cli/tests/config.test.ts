@@ -43,7 +43,7 @@ describe("resolveApiUrl", () => {
   it("falls back to the default when nothing else is available", () => {
     delete process.env.SKILLFORGE_API_URL;
 
-    expect(resolveApiUrl(undefined, tempDir)).toBe("http://localhost:5080");
+    expect(resolveApiUrl(undefined, tempDir)).toBe("https://api.skillforge.mbadet.fr");
   });
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "@pkomat/skillforge-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI de synchronisation pour SkillForge (login, pull, push de Skills/MCP/Agents)",
   "type": "module",
   "repository": {

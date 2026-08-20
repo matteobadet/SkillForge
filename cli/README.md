@@ -62,7 +62,9 @@ version antérieure).
 ### Options globales
 
 - `--api-url <url>` : cible une autre instance SkillForge (sinon
-  `SKILLFORGE_API_URL`, sinon `http://localhost:5080`).
+  `SKILLFORGE_API_URL`, sinon `https://api.skillforge.mbadet.fr` — utile
+  surtout pour pointer vers une instance locale de développement, ex.
+  `http://localhost:5080`).
 
 ## Exemple
 
