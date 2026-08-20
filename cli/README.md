@@ -7,7 +7,7 @@ publiés dans les équipes d'une instance SkillForge.
 ## Installation
 
 ```bash
-npm install -g @matteobadet/skillforge-cli
+npm install -g @pkomat/skillforge-cli
 ```
 
 La commande installée s'appelle `skillforge` (seul le nom du paquet npm est

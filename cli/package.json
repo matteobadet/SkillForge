@@ -1,5 +1,5 @@
 {
-  "name": "@matteobadet/skillforge-cli",
+  "name": "@pkomat/skillforge-cli",
   "version": "0.1.0",
   "description": "CLI de synchronisation pour SkillForge (login, pull, push de Skills/MCP/Agents)",
   "type": "module",

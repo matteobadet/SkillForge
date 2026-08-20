@@ -1,13 +1,13 @@
 name: Publish CLI
 
-# Publie @matteobadet/skillforge-cli sur npm à chaque push sur main qui modifie
+# Publie @pkomat/skillforge-cli sur npm à chaque push sur main qui modifie
 # cli/package.json — seulement si la version qu'il contient n'est pas déjà
 # publiée (bump la version dans package.json pour déclencher une publication).
 #
 # Secret requis (repo settings > Secrets and variables > Actions) :
 #   NPM_TOKEN — token d'automation npm (npmjs.com > Access Tokens > Generate
 #   New Token > Automation), avec droit de publication sur le scope
-#   @matteobadet.
+#   @pkomat.
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
         id: check
         run: |
           PKG_VERSION=$(node -p "require('./package.json').version")
-          if npm view "@matteobadet/skillforge-cli@$PKG_VERSION" version 2>/dev/null; then
+          if npm view "@pkomat/skillforge-cli@$PKG_VERSION" version 2>/dev/null; then
             echo "already_published=true" >> "$GITHUB_OUTPUT"
           else
             echo "already_published=false" >> "$GITHUB_OUTPUT"
